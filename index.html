@@ -231,7 +231,7 @@ main{max-width:900px;margin:0 auto;padding:14px 13px 120px}
   <div id="board"></div>
   <div class="notice" id="footNotice">
     공부 기록은 노션에 그대로 저장돼요. 진행 중인 공부는 이 화면에서 시간이 실시간으로 올라가고,
-    <b>일시정지</b>나 <b>공부 끝</b>을 누르면 그때 노션에 시간이 저금됩니다.
+    <b>일시정지</b>나 <b>공부 끝</b>을 누르면 그때 노션에 시간이 저장됩니다.
   </div>
   <div id="globalError" class="errbox" style="display:none"></div>
 </main>
@@ -562,7 +562,7 @@ function cardHtml(p){
   const chips = [];
   chips.push(`<span class="chip ${running?'run':done?'done':paused?'pause':''}">${esc(p.status || '시작전')}</span>`);
   if(running) chips.push(`<span class="chip timer" data-timer="${esc(p.startTime||'')}">⏱ 00:00</span>`);
-  if(paused) chips.push(`<span class="chip">⏸ 저금 ${saved}분</span>`);
+  if(paused) chips.push(`<span class="chip">⏸ 저장 ${saved}분</span>`);
   if(p.planType) chips.push(`<span class="chip">${esc(p.planType)}</span>`);
   if(goal) chips.push(`<span class="chip goal">🎯 ${esc(goal.name)}</span>`);
   if(p.carryCount) chips.push(`<span class="chip carry">↻ 이월 ${p.carryCount}회</span>`);
@@ -630,7 +630,7 @@ function startTicker(){
    ========================================================================= */
 const LABELS = {
   start:['공부 시작','지금부터 시간을 재기 시작해요. 일시정지 후 다시 누르면 이어서 해요.','▶ 시작'],
-  pause:['일시정지','지금까지 공부한 시간을 노션에 저금하고 잠시 멈춰요.','Ⅱ 일시정지'],
+  pause:['일시정지','지금까지 공부한 시간을 노션에 저장하고 잠시 멈춰요.','Ⅱ 일시정지'],
   stop:['공부 끝','오늘의 이 공부를 완료로 표시하고 시간을 저장해요.','■ 완료'],
   carry:['이월하기','실행일을 다음 날로 넘겨요. 이월 횟수가 1 늘고 상태는 시작전으로 초기화돼요.','↻ 이월']
 };
@@ -873,7 +873,7 @@ function demoApi(p){
       plan.savedMinutes = (Number(plan.savedMinutes) || 0) + add;
       plan.finishTime = new Date().toISOString(); plan.startTime = null;
       plan.status = p.action === 'pause' ? '일시 중지' : '완료';
-      out(p.action === 'pause' ? add + '분 저금하고 일시정지했어요.' : add + '분 저금! 공부 완료 🎉'); return;
+      out(p.action === 'pause' ? add + '분 저장하고 일시정지했어요.' : add + '분 저장! 공부 완료 🎉'); return;
     }
     if(p.action === 'carry'){
       plan.runDate = p.targetDate || t; plan.carryCount = (Number(plan.carryCount) || 0) + 1;
