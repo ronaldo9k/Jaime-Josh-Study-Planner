@@ -231,7 +231,7 @@ main{max-width:900px;margin:0 auto;padding:14px 13px 120px}
   <div id="board"></div>
   <div class="notice" id="footNotice">
     공부 기록은 노션에 그대로 저장돼요. 진행 중인 공부는 이 화면에서 시간이 실시간으로 올라가고,
-    <b>일시정지</b>나 <b>공부 끝</b>을 누르면 그때 노션에 시간이 저장됩니다.
+    <b>일시정지</b>나 <b>공부 끝</b>을 누르면 그때 노션에 시간이 저금됩니다.
   </div>
   <div id="globalError" class="errbox" style="display:none"></div>
 </main>
@@ -331,7 +331,7 @@ main{max-width:900px;margin:0 auto;padding:14px 13px 120px}
          (내 브라우저 저장소에 가짜 데이터를 넣어 모든 기능을 미리 눌러볼 수 있어요)
    [2] 노션 토큰은 절대 이 파일에 넣지 않습니다. 토큰은 GAS 스크립트 속성에만!
    ========================================================================= */
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwsGh27HnmIgt0LV8mmR_20l_DQqsYc6A_PhZBW0MD680APrDVnqVJsC6Iy_eu8eJ8s/exec';   /* 예: https://script.google.com/macros/s/..../exec */
+const GAS_URL = 'PASTE_YOUR_GAS_WEB_APP_URL_HERE';   /* 예: https://script.google.com/macros/s/..../exec */
 const DEMO = !GAS_URL || GAS_URL.indexOf('PASTE_YOUR') === 0;
 
 /* ---------- 상태 ---------- */
@@ -519,19 +519,23 @@ function todayBoard(){
     bySlot.get(p.slotId).push(p);
   });
   const html = [];
+  /* ★ 개선: 계획이 실제로 있는 시간대만 표시 (빈 시간대는 아예 건너뜀) */
   slots.forEach(s => {
     const list = bySlot.get(s.id) || [];
+    if(!list.length) return;
     const target = list.reduce((a,p) => a + (Number(p.targetMinutes)||0), 0);
     const saved = list.reduce((a,p) => a + (Number(p.savedMinutes)||0), 0);
     html.push(`<div class="grouphead"><div><div class="gt">🕘 ${esc(s.name)}</div>
-      <div class="gd">${list.length ? `계획 ${list.length}개 · ${saved}/${target}분` : '계획 없음 (빈 시간대)'}</div></div>
-      ${list.length ? `<div class="gd">${target ? Math.min(100,Math.round(saved/target*100)) : 0}%</div>` : ''}</div>`);
-    html.push(list.length ? list.map(cardHtml).join('') : '<div class="empty" style="padding:16px">이 시간대는 아직 비어 있어요.</div>');
+      <div class="gd">계획 ${list.length}개 · ${saved}/${target}분</div></div>
+      <div class="gd">${target ? Math.min(100,Math.round(saved/target*100)) : 0}%</div></div>`);
+    html.push(list.map(cardHtml).join(''));
   });
   if(noSlot.length){
     html.push('<div class="grouphead"><div><div class="gt">📥 시간대 미배정 (이월된 공부)</div><div class="gd">시간대를 정해 주면 위 시간표에 자리를 잡아요</div></div></div>');
     html.push(noSlot.map(cardHtml).join(''));
   }
+  /* 계획은 있는데 시간대가 하나도 안 맞는 경우에도 화면이 비지 않도록 */
+  if(!html.length) return '<div class="empty"><b>오늘은 시간대에 배치된 계획이 없어요</b>＋ 새 공부 계획으로 오늘 할 공부를 만들어 보세요!</div>';
   return html.join('');
 }
 function flatList(list, showSlotHead){
@@ -558,7 +562,7 @@ function cardHtml(p){
   const chips = [];
   chips.push(`<span class="chip ${running?'run':done?'done':paused?'pause':''}">${esc(p.status || '시작전')}</span>`);
   if(running) chips.push(`<span class="chip timer" data-timer="${esc(p.startTime||'')}">⏱ 00:00</span>`);
-  if(paused) chips.push(`<span class="chip">⏸ 저장 ${saved}분</span>`);
+  if(paused) chips.push(`<span class="chip">⏸ 저금 ${saved}분</span>`);
   if(p.planType) chips.push(`<span class="chip">${esc(p.planType)}</span>`);
   if(goal) chips.push(`<span class="chip goal">🎯 ${esc(goal.name)}</span>`);
   if(p.carryCount) chips.push(`<span class="chip carry">↻ 이월 ${p.carryCount}회</span>`);
@@ -626,7 +630,7 @@ function startTicker(){
    ========================================================================= */
 const LABELS = {
   start:['공부 시작','지금부터 시간을 재기 시작해요. 일시정지 후 다시 누르면 이어서 해요.','▶ 시작'],
-  pause:['일시정지','지금까지 공부한 시간을 노션에 저장하고 잠시 멈춰요.','Ⅱ 일시정지'],
+  pause:['일시정지','지금까지 공부한 시간을 노션에 저금하고 잠시 멈춰요.','Ⅱ 일시정지'],
   stop:['공부 끝','오늘의 이 공부를 완료로 표시하고 시간을 저장해요.','■ 완료'],
   carry:['이월하기','실행일을 다음 날로 넘겨요. 이월 횟수가 1 늘고 상태는 시작전으로 초기화돼요.','↻ 이월']
 };
@@ -869,7 +873,7 @@ function demoApi(p){
       plan.savedMinutes = (Number(plan.savedMinutes) || 0) + add;
       plan.finishTime = new Date().toISOString(); plan.startTime = null;
       plan.status = p.action === 'pause' ? '일시 중지' : '완료';
-      out(p.action === 'pause' ? add + '분 저장하고 일시정지했어요.' : add + '분 저장! 공부 완료 🎉'); return;
+      out(p.action === 'pause' ? add + '분 저금하고 일시정지했어요.' : add + '분 저금! 공부 완료 🎉'); return;
     }
     if(p.action === 'carry'){
       plan.runDate = p.targetDate || t; plan.carryCount = (Number(plan.carryCount) || 0) + 1;
