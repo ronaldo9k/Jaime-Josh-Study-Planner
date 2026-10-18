@@ -312,6 +312,21 @@ main{max-width:900px;margin:0 auto;padding:14px 13px 120px}
 .pcard2 .rellock{position:absolute;top:4px;right:5px;font-size:9.5px;font-weight:900;background:rgba(18,40,60,.88);color:#fff;border-radius:999px;padding:3px 7px}
 .pcard2 .relnew{position:absolute;top:4px;right:5px;font-size:9.5px;font-weight:900;background:var(--green);color:#fff;border-radius:999px;padding:3px 7px;transform:rotate(6deg)}
 
+/* ===== v5.1 : 새로고침 버튼 크게 · 완료 항목 접기 버튼 ===== */
+.iconbtn.refresh{font-size:22px;padding:9px 14px;line-height:1}
+.doneDivider{cursor:pointer;-webkit-user-select:none;user-select:none}
+.doneDivider:active{transform:scale(.98)}
+.doneDivider .dvbtn{flex:0 0 auto;font-size:10.5px;font-weight:900;color:var(--navy);background:#eef1f5;border:1px solid var(--line);border-radius:999px;padding:3px 9px;white-space:nowrap}
+.doneDivider .dvbtn:after{content:""}
+
+/* ===== v5.1 : 모바일(639px 이하) 전용 — 상단 버튼 2줄 배치 ===== */
+@media(max-width:639px){
+  .headrow{align-items:center}
+  header h1{white-space:nowrap}
+  .hbtns{display:grid;grid-template-columns:repeat(2,auto);gap:6px;justify-content:end}
+  .hbtns .iconbtn{min-width:46px}
+}
+
 @media(min-width:640px){
   .sheetback{align-items:center;padding:20px}
   .sheet{border-radius:24px}
@@ -333,7 +348,7 @@ main{max-width:900px;margin:0 auto;padding:14px 13px 120px}
       <button class="iconbtn gold" onclick="openBank()" title="골 저금통 · 나의 축구 커리어">🏆</button>
       <button class="iconbtn" onclick="openHelp()" title="사용 방법 보기">❓</button>
       <button class="iconbtn" onclick="openParent()" title="부모 코너 (아빠 전용)">🔐</button>
-      <button class="iconbtn" onclick="refreshAll()" title="노션에서 최신 정보 다시 불러오기">↻</button>
+      <button class="iconbtn refresh" onclick="refreshAll()" title="노션에서 최신 정보 다시 불러오기">↻</button>
     </div>
   </div>
   <div class="goalchips" id="goalChips"></div>
@@ -972,15 +987,33 @@ function planOrder(a, b){
   if((b.carryCount||0) !== (a.carryCount||0)) return (b.carryCount||0) - (a.carryCount||0);
   return String(a.dueDate||'9999').localeCompare(String(b.dueDate||'9999'));
 }
+/* v5.1 : 완료 항목 접기/펼치기 (기기에 기억됨 · 서버 호출 0회) */
+let doneFolded = null;
+function isDoneFolded(){
+  if(doneFolded === null){
+    try{ doneFolded = localStorage.getItem('junmoDoneFolded') === '1'; }catch(e){ doneFolded = false; }
+  }
+  return doneFolded;
+}
+function toggleDoneFold(){
+  doneFolded = !doneFolded;
+  try{ localStorage.setItem('junmoDoneFolded', doneFolded ? '1' : '0'); }catch(e){}
+  render();
+}
 function withDoneDivider(sorted){
-  /* 완료 카드가 시작되는 지점에 구분선을 한 번만 삽입 */
+  /* 완료 카드가 시작되는 지점에 구분선을 한 번만 삽입.
+     v5.1 : 구분선 자체가 접기/펼치기 버튼 (접어두면 끝낸 공부가 아래로 사라짐) */
   const out = [];
   let divDone = false;
+  const folded = isDoneFolded();
+  const doneCnt = sorted.filter(p => p.status === '완료').length;
   sorted.forEach(p => {
     if(!divDone && p.status === '완료' && out.length){
-      out.push('<div class="doneDivider">✅ 여기부터 오늘 끝낸 공부</div>');
+      out.push('<div class="doneDivider" role="button" tabindex="0" aria-pressed="' + folded + '" onclick="toggleDoneFold()" onkeydown="if(event.key===\'Enter\')toggleDoneFold()">✅ 여기부터 오늘 끝낸 공부'
+        + '<span class="dvbtn">' + (folded ? '▼ 펼쳐서 보기 ' : '▲ 접어서 숨기기 ') + doneCnt + '개</span></div>');
       divDone = true;
     }
+    if(folded && p.status === '완료') return;   /* 접힘 상태에서는 완료 카드 숨김 */
     out.push(cardHtml(p));
   });
   return out.join('');
@@ -1536,6 +1569,7 @@ function openHelp(){
     + '<div class="phint"><b>3.</b> ④ <b>당일계획 / 기간계획 / 미래계획</b> 중에 하나를 골라요. (태블릿 키보드의 <b>이동</b>을 눌러도 자동으로 넘어가요!)</div>'
     + '<div class="phint"><b>4.</b> <b>노션에 저장</b>을 누르면 끝! 오늘 시간표에 나타나요.</div>'
     + '<div class="phint" style="margin-top:8px">▶ 공부 시작 → ■ 공부 끝 을 누르면, <b>목표 시간 안에(또는 딱 맞게)</b> 끝냈을 때 <b>⚽ 골 1개</b>가 저금통에 쌓여요! (초과하면 골 없음!)</div>'
+    + '<div class="phint">· 끝낸 공부는 시간표 <b>맨 아래로 자동 이동</b>돼요. 「✅ 여기부터 오늘 끝낸 공부」 줄을 누르면 <b>접었다 펼치기</b> 할 수 있어요! (접어둔 상태는 이 기기에 기억돼요)</div>'
     + '</div>'
     + '<div class="subbox"><div class="t">⚽ 골은 이렇게 쌓여요</div>'
     + '<div class="phint">· 공부 1개 끝낼 때마다 <b>1골</b> (같은 공부는 한 번만!)</div>'
@@ -1557,7 +1591,7 @@ function openHelp(){
     + '<div class="phint"><b>🏆 골 저금통</b> : 나의 축구 커리어(골·리그·스쿼드·미션·이적 시장)를 보여줘요.</div>'
     + '<div class="phint"><b>❓ 사용 방법</b> : 이 도움말을 열어요.</div>'
     + '<div class="phint"><b>🔐 부모 코너</b> : 아빠 전용이에요. PIN을 알아야 열려요(기본 1234). 보너스 골 지급·PIN 변경·기록 확인에 필요해요.</div>'
-    + '<div class="phint"><b>↻ 새로고침</b> : 노션에 저장된 최신 내용을 다시 불러와요. 화면이 안 바뀐 것 같을 때 눌러요.</div>'
+    + '<div class="phint"><b>↻ 새로고침</b> : 노션에 저장된 최신 내용을 다시 불러와요. 화면이 안 바뀐 것 같을 때 눌러요. (v5.1에서 버튼을 더 크게 키웠어요!)</div>'
     + '</div>';
   openSheet('helpBack');
 }
@@ -1902,6 +1936,7 @@ function demoApi(p){
 })();
 </script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
