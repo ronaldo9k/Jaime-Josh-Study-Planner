@@ -4,10 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#12283c">
-<title>준모의 공부 계획 관리 ⚽</title>
+<title>김준모 공부계획관리 ⚽</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="DOYEONG.png">
+<link rel="apple-touch-icon" href="DOYEONG.png">
+<link rel="manifest" href="manifest.json">
 <style>
 /* ===== 준모의 공부 계획 관리 v4.0 : 디자인 토큰 ===== */
 :root{
@@ -285,6 +288,30 @@ main{max-width:900px;margin:0 auto;padding:14px 13px 120px}
 @keyframes sk{0%{background-position:0 0}100%{background-position:-200% 0}}
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:50;display:none}
 
+/* ===== v4.1 : 상단 컴팩트 FC 스트립 ===== */
+.bankhero.strip{padding:11px 13px;border-radius:16px}
+.bankhero.strip:after{font-size:60px;top:-14px}
+.striptop{display:flex;align-items:center;gap:8px;flex-wrap:wrap;position:relative;z-index:1}
+.striptop .leaguepill{margin-top:0;padding:6px 11px;font-size:12px;gap:6px}
+.striptop .leaguepill img{width:19px;height:13px}
+.striptop .leaguepill .tro{font-size:13px}
+.stripnext{margin:0;font-size:11px;font-weight:800;line-height:1.5}
+.stripchips{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}
+.stripchips .bbox{display:flex;align-items:baseline;justify-content:space-between;gap:6px;padding:7px 10px;border-radius:11px}
+.stripchips .bbox span{display:inline;font-size:10.5px}
+.stripchips .bbox b{font-size:16px;margin-top:0}
+.bankhero.strip .leaguebar{height:6px;margin-top:8px}
+/* ===== v4.1 : 목표달성 현황 통계칸 · 끝낸 공부 구분선 · 스쿼드 카드 강조 ===== */
+.stat.small b{font-size:13px;letter-spacing:-.3px}
+.doneDivider{margin:12px 2px 2px;font-size:11px;font-weight:900;color:var(--muted);display:flex;align-items:center;gap:7px}
+.doneDivider:after{content:"";flex:1;height:1px;background:var(--line)}
+.pcard2 .nm{font-size:12.5px}
+.pcard2 .po{font-size:10px;font-weight:900;background:rgba(255,255,255,.4);border-radius:999px;padding:2px 8px;display:inline-block;margin-top:3px;opacity:1}
+.pcard2.locked .po{background:rgba(0,0,0,.07)}
+.pcard2.locked{opacity:.6;filter:grayscale(.65)}
+.pcard2 .rellock{position:absolute;top:4px;right:5px;font-size:9.5px;font-weight:900;background:rgba(18,40,60,.88);color:#fff;border-radius:999px;padding:3px 7px}
+.pcard2 .relnew{position:absolute;top:4px;right:5px;font-size:9.5px;font-weight:900;background:var(--green);color:#fff;border-radius:999px;padding:3px 7px;transform:rotate(6deg)}
+
 @media(min-width:640px){
   .sheetback{align-items:center;padding:20px}
   .sheet{border-radius:24px}
@@ -298,8 +325,8 @@ main{max-width:900px;margin:0 auto;padding:14px 13px 120px}
 <header>
   <div class="headrow">
     <div>
-      <div class="eyebrow">JOONMO STUDY · SEASON 4</div>
-      <h1>준모의 공부 계획 관리 ⚽</h1>
+      <div class="eyebrow">JOONMO STUDY PLAN</div>
+      <h1>김준모 공부계획관리 ⚽</h1>
       <div class="subline"><span id="connDot" class="dot"></span><span id="todayLabel">노션에 연결하는 중…</span></div>
     </div>
     <div class="hbtns">
@@ -313,25 +340,23 @@ main{max-width:900px;margin:0 auto;padding:14px 13px 120px}
 </header>
 
 <main>
-  <div class="bankhero" onclick="openBank()" role="button" tabindex="0" style="margin:0 0 14px;cursor:pointer">
-    <div class="beyebrow">JOONMO FC · CAREER MODE</div>
-    <div class="btitle">⚽ GOAL BANK</div>
-    <div class="bsub" id="stripSub">공부를 끝내고 골을 넣어 세계 챔피언에 도전하자!</div>
-    <div class="leaguepill" id="stripPill"><span class="tro">⚽</span> 불러오는 중…</div>
+  <div class="bankhero strip" onclick="openBank()" role="button" tabindex="0" style="margin:0 0 14px;cursor:pointer">
+    <div class="striptop">
+      <span class="leaguepill" id="stripPill"><span class="tro">⚽</span> 불러오는 중…</span>
+      <span class="bsub stripnext" id="stripNext">골 저금통을 불러오는 중…</span>
+    </div>
     <div class="leaguebar"><i id="stripBar" style="width:0%"></i></div>
-    <div class="bsub" id="stripNext" style="margin-top:7px">골 저금통을 불러오는 중…</div>
-    <div class="bgrid">
+    <div class="stripchips">
       <div class="bbox"><span>🏦 누적 골</span><b id="stripTotal">—</b></div>
       <div class="bbox"><span>📅 이번 달 골</span><b id="stripMonth">—</b></div>
     </div>
-    <div class="bsub" style="margin-top:10px;opacity:.9">👆 여기를 누르면 내 스쿼드 · 미션 · 이적 시장이 열려요!</div>
   </div>
 
   <div class="stats">
     <button class="stat hero" onclick="openStatSheet('saved')"><span class="q">?</span><b id="statSaved">—</b><span>오늘 공부한 시간</span></button>
     <button class="stat" onclick="openStatSheet('target')"><span class="q">?</span><b id="statTarget">—</b><span>오늘 목표 시간</span></button>
     <button class="stat" onclick="openStatSheet('done')"><span class="q">?</span><b id="statDone">—</b><span>완료 / 전체</span></button>
-    <button class="stat" onclick="openStatSheet('rate')"><span class="q">?</span><b id="statRate">—</b><span>달성률</span></button>
+    <button class="stat" id="statRateBox" onclick="openStatSheet('rate')"><span class="q">?</span><b id="statRate">—</b><span id="statRateSub">목표달성 현황</span></button>
   </div>
   <div class="stat-hint">👆 통계 칸을 누르면 쉬운 설명과 세부 내역이 나와요!</div>
 
@@ -491,7 +516,7 @@ main{max-width:900px;margin:0 auto;padding:14px 13px 120px}
 <div class="sheetback" id="bankBack" onclick="if(event.target===this)closeSheet('bankBack')">
   <div class="sheet" style="max-width:680px">
     <h2>⚽ 골 저금통 · 나의 축구 커리어</h2>
-    <div class="hint">공부 하나를 끝낼 때마다 ⚽ <b>1골</b>! <b>5골마다 리그 승격</b> + <b>선수 카드 1장 영입</b>이에요.</div>
+    <div class="hint">공부 하나를 끝낼 때마다 ⚽ <b>1골</b>! <b>10골마다 리그 승격</b> + <b>5골마다 선수 카드 1장 영입</b>이에요.<br>※ 목표 시간보다 <b>1분이라도 초과</b>하면 목표달성 실패라 골이 쌓이지 않아요!</div>
     <div id="bankBody"></div>
     <div class="sheetactions">
       <button class="cancel" onclick="closeSheet('bankBack')">닫기</button>
@@ -598,7 +623,7 @@ main{max-width:900px;margin:0 auto;padding:14px 13px 120px}
        - 값이 그대로(PASTE_YOUR...)면 '체험(데모) 모드'로 동작해요.
    [2] 노션 토큰은 절대 이 파일에 넣지 않습니다. 토큰은 GAS 스크립트 속성에만!
    ========================================================================= */
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwFzzXNVGlb2lyP70IG-yvPa_8pccdsAu6arRtUD5HDcq-_h0nWKSvp_FQKcIiwYHK0/exec';   /* 예: https://script.google.com/macros/s/..../exec */
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzvsaCPiezX73tD3fzp8FTflfXFpuWblkNkV1qO2TSa4-Rz5XqM33WI8aOtvYtInHMR/exec';   /* 예: https://script.google.com/macros/s/..../exec */
 const DEMO = !GAS_URL || GAS_URL.indexOf('PASTE_YOUR') === 0;
 
 /* ---------- 상태 ---------- */
@@ -723,19 +748,26 @@ function openStatSheet(kind){
   const done = view.filter(p => p.status === '완료').length;
   const running = view.filter(p => p.status === '진행중').length;
   const rate = T ? Math.min(999, Math.round(S / T * 100)) : 0;
+  const diff = T - S;   /* 양수=단축(일찍 끝), 0=딱 맞춤, 음수=초과 */
   const min = n => Math.floor(n/60) + '시간 ' + (n%60) + '분';
+  function achMsg(d){
+    if(!T) return '목표 시간을 정해 주세요!';
+    if(d > 0) return '🎯 ' + d + '분 단축! 목표달성!';
+    if(d === 0) return '🎯 목표달성!';
+    return '⏰ ' + (-d) + '분 초과! 목표달성 실패!';
+  }
   let title, desc, body;
   if(kind === 'saved'){
     title = '⏱ 오늘 공부한 시간';
-    desc = '「오늘 공부한 시간」은 오늘 계획에서 <b>일시정지·공부 끝을 눌러 저금한 시간</b>의 합계예요. 진행 중인 시간은 저금되기 전이라 아직 안 들어가요!';
-    body = '<div class="kv"><span>저금된 시간 합계</span><b>' + S + '분 (' + min(S) + ')</b></div>'
+    desc = '「오늘 공부한 시간」은 오늘 계획에서 <b>일시정지·공부 끝을 눌러 저장한 시간</b>의 합계예요. 진행 중인 시간은 저장되기 전이라 아직 안 들어가요!';
+    body = '<div class="kv"><span>저장된 시간 합계</span><b>' + S + '분 (' + min(S) + ')</b></div>'
          + '<div class="kv"><span>지금 진행 중</span><b>' + running + '개</b></div>'
          + '<div class="kv"><span>오늘 목표 시간</span><b>' + T + '분</b></div>';
   }else if(kind === 'target'){
     title = '🎯 오늘 목표 시간';
     desc = '오늘 계획들의 <b>목표 시간(분)</b>을 모두 더한 값이에요. 이 시간만 채우면 오늘 공부 끝!';
     body = '<div class="kv"><span>오늘 목표 합계</span><b>' + T + '분 (' + min(T) + ')</b></div>'
-         + '<div class="kv"><span>아직 저금한 시간</span><b>' + S + '분</b></div>'
+         + '<div class="kv"><span>아직 저장한 시간</span><b>' + S + '분</b></div>'
          + '<div class="kv"><span>더 해야 하는 시간</span><b>' + Math.max(0, T - S) + '분</b></div>';
   }else if(kind === 'done'){
     title = '✅ 완료 / 전체';
@@ -744,12 +776,14 @@ function openStatSheet(kind){
          + '<div class="kv"><span>전체</span><b>' + view.length + '개</b></div>'
          + '<div class="kv"><span>남은 계획</span><b>' + Math.max(0, view.length - done) + '개</b></div>';
   }else{
-    title = '🔥 달성률';
-    desc = '<b>(공부한 시간 ÷ 목표 시간) × 100</b> 이에요. 100%를 넘으면 목표보다 더 열심히 한 거예요!';
-    body = '<div class="bigpct">' + rate + '%</div>'
+    title = '🎯 목표달성 현황';
+    desc = '<b>목표 시간</b> 대비 <b>공부한 시간</b>이 얼마나 차이 나는지 알려줘요. 목표 시간보다 <b>적게 또는 딱 맞게</b> 끝내면 목표달성(⚽ 골 +1), <b>1분이라도 초과</b>하면 목표달성 실패예요!';
+    body = '<div class="bigpct" style="color:' + (diff >= 0 ? 'var(--green)' : 'var(--red)') + '">' + achMsg(diff) + '</div>'
          + '<div class="bigbar"><i style="width:' + Math.min(100, rate) + '%"></i></div>'
          + '<div class="kv"><span>공부한 시간</span><b>' + S + '분</b></div>'
-         + '<div class="kv"><span>목표 시간</span><b>' + T + '분</b></div>';
+         + '<div class="kv"><span>목표 시간</span><b>' + T + '분</b></div>'
+         + '<div class="kv"><span>' + (diff >= 0 ? '단축한 시간' : '초과한 시간') + '</span><b>' + Math.abs(diff) + '분</b></div>'
+         + '<div class="kv"><span>참고 · (공부한 ÷ 목표) × 100</span><b>' + rate + '%</b></div>';
   }
   $('statTitle').innerHTML = title;
   $('statDesc').innerHTML = desc;
@@ -862,7 +896,13 @@ function render(){
   $('statSaved').textContent  = totalSaved + '분';
   $('statTarget').textContent = totalTarget + '분';
   $('statDone').textContent   = done + ' / ' + scope.length;
-  $('statRate').textContent   = rate + '%';
+  /* 🎯 목표달성 현황 : 목표 대비 ±분을 메시지로 표시 */
+  const rdiff = totalTarget - totalSaved;
+  const rateBox = $('statRateBox');
+  if(!totalTarget){ $('statRate').textContent = '—'; }
+  else if(rdiff > 0){ $('statRate').textContent = rdiff + '분 단축!'; rateBox.style.color = 'var(--green)'; }
+  else if(rdiff === 0){ $('statRate').textContent = '달성!'; rateBox.style.color = 'var(--green)'; }
+  else { $('statRate').textContent = (-rdiff) + '분 초과'; rateBox.style.color = 'var(--red)'; }
   renderGoalChips();
   $('board').innerHTML = scope.length ? boardHtml() : emptyHtml();
   startTicker();
@@ -923,7 +963,28 @@ function goalRate(list){
   return t ? Math.min(100, Math.round(a / t * 100)) : 0;
 }
 
-/* 오늘 시간표 : 시간대 순서대로 */
+/* 오늘 시간표 : 시간대 순서대로. 단, 끝낸 공부는 맨 아래로 내려서 구분 (v4.1) */
+function planOrder(a, b){
+  const ad = a.status === '완료' ? 1 : 0, bd = b.status === '완료' ? 1 : 0;
+  if(ad !== bd) return ad - bd;   /* 진행 중 먼저, 완료는 아래로 */
+  const ao = a.slotOrder ?? 9999, bo = b.slotOrder ?? 9999;
+  if(ao !== bo) return ao - bo;
+  if((b.carryCount||0) !== (a.carryCount||0)) return (b.carryCount||0) - (a.carryCount||0);
+  return String(a.dueDate||'9999').localeCompare(String(b.dueDate||'9999'));
+}
+function withDoneDivider(sorted){
+  /* 완료 카드가 시작되는 지점에 구분선을 한 번만 삽입 */
+  const out = [];
+  let divDone = false;
+  sorted.forEach(p => {
+    if(!divDone && p.status === '완료' && out.length){
+      out.push('<div class="doneDivider">✅ 여기부터 오늘 끝낸 공부</div>');
+      divDone = true;
+    }
+    out.push(cardHtml(p));
+  });
+  return out.join('');
+}
 function todayBoard(){
   const bySlot = new Map();
   const noSlot = [];
@@ -941,11 +1002,11 @@ function todayBoard(){
     html.push('<div class="grouphead"><div><div class="gt">🕘 ' + esc(s.name) + '</div>'
       + '<div class="gd">계획 ' + list.length + '개 · ' + saved + '/' + target + '분</div></div>'
       + '<div class="gd">' + (target ? Math.min(100,Math.round(saved/target*100)) : 0) + '%</div></div>');
-    html.push(list.map(cardHtml).join(''));
+    html.push(withDoneDivider(list.slice().sort(planOrder)));
   });
   if(noSlot.length){
     html.push('<div class="grouphead"><div><div class="gt">📥 시간대 미배정 (이월된 공부)</div><div class="gd">시간대를 정해 주면 위 시간표에 자리를 잡아요</div></div></div>');
-    html.push(noSlot.map(cardHtml).join(''));
+    html.push(withDoneDivider(noSlot.slice().sort(planOrder)));
   }
   if(!html.length) return '<div class="empty"><b>이 날은 시간대에 배치된 계획이 없어요</b>＋ 새 공부 계획으로 공부를 만들어 보세요!</div>';
   return html.join('');
@@ -1173,7 +1234,7 @@ function bindPlanType(){
 }
 function bindQuickMinutes(){
   const box = $('quickMin');
-  const presets = [10, 15, 20, 30, 40, 50, 60, 90];
+  const presets = [10, 15, 20, 30, 40, 50, 60, 90, 120, 180];
   box.innerHTML = presets.map(n => '<button type="button" data-min="' + n + '">' + n + '분</button>').join('');
   box.querySelectorAll('button').forEach(b => b.onclick = () => {
     $('fMinutes').value = b.dataset.min;
@@ -1315,8 +1376,8 @@ function renderBank(){
       + '<span class="nm">' + esc(p.n) + '</span>'
       + '<span class="po">' + esc(p.p) + '</span>'
       + '<span class="tr">' + esc(p.t) + '</span>'
-      + (has ? (isNew ? '<span class="rel" style="background:rgba(255,255,255,.55);color:#1f8a5b;transform:rotate(-8deg)">방금 영입!</span>' : '')
-             : '<span class="rel">🔒 ' + need + '골</span>')
+      + (has ? (isNew ? '<span class="relnew">🎉 방금 영입!</span>' : '')
+             : '<span class="rellock">🔒 ' + need + '골</span>')
       + '</div>';
   }).join('');
 
@@ -1350,7 +1411,7 @@ function renderBank(){
   box.innerHTML = note
     + '<div class="bankhero">'
     + '<div class="beyebrow">JOONMO FC · CAREER MODE</div>'
-    + '<div class="btitle">' + (total >= 30 ? '🏆 월드 챔피언!' : '⚽ 나의 축구 커리어') + '</div>'
+    + '<div class="btitle">' + (total >= 60 ? '🏆 월드 챔피언!' : '⚽ 나의 축구 커리어') + '</div>'
     + '<div class="bsub">' + (d.streakDays ? '🔥 연속 골인 ' + d.streakDays + '일 · ' : '') + '오늘 ' + (d.todayGoals||0) + '골 · 이번 달 ' + (d.monthlyGoals||0) + '골</div>'
     + '<div class="leaguepill">' + flagImg(d.league || {}) + ' ' + esc((d.league||{}).name || '') + '</div>'
     + '<div class="leaguebar"><i style="width:' + (d.progressInLeague||0) + '%"></i></div>'
@@ -1393,7 +1454,7 @@ async function loadGame(silent){
   }catch(e){
     bankStats = null;
     if($('bankBody')) $('bankBody').innerHTML = '<div class="empty"><b>골 저금통을 불러오지 못했어요</b>' + esc(e.message) + '</div>';
-    if($('stripSub')) $('stripSub').textContent = '골 저금통을 불러오지 못했어요.';
+    if($('stripNext')) $('stripNext').textContent = '골 저금통을 불러오지 못했어요.';
     if(!silent) toast('골 저금통: ' + e.message, 'bad');
   }
 }
@@ -1410,7 +1471,6 @@ function renderStrip(){
   $('stripNext').innerHTML = d.nextLeague
     ? '다음 승격 <b>' + esc(d.nextLeague.name) + '</b>까지 <b>' + d.goalsToNext + '골</b> · 영입 선수 ' + Math.floor(total/5) + '명'
     : '👑 월드 챔피언 달성! 최고 등급이에요.';
-  $('stripSub').textContent = total >= 30 ? '월드 챔피언! 준모의 전설이 시작됐어요.' : '공부를 끝내고 골을 넣어 세계 챔피언에 도전하자!';
 }
 
 function openBank(){
@@ -1475,15 +1535,16 @@ function openHelp(){
     + '<div class="phint"><b>2.</b> ①시간대 → ②공부 내용 → ③날짜·목표 시간(분) 순서로 적어요.</div>'
     + '<div class="phint"><b>3.</b> ④ <b>당일계획 / 기간계획 / 미래계획</b> 중에 하나를 골라요. (태블릿 키보드의 <b>이동</b>을 눌러도 자동으로 넘어가요!)</div>'
     + '<div class="phint"><b>4.</b> <b>노션에 저장</b>을 누르면 끝! 오늘 시간표에 나타나요.</div>'
-    + '<div class="phint" style="margin-top:8px">▶ 공부 시작 → ■ 공부 끝 을 누르면 <b>⚽ 골 1개</b>가 저금통에 쌓여요!</div>'
+    + '<div class="phint" style="margin-top:8px">▶ 공부 시작 → ■ 공부 끝 을 누르면, <b>목표 시간 안에(또는 딱 맞게)</b> 끝냈을 때 <b>⚽ 골 1개</b>가 저금통에 쌓여요! (초과하면 골 없음!)</div>'
     + '</div>'
     + '<div class="subbox"><div class="t">⚽ 골은 이렇게 쌓여요</div>'
     + '<div class="phint">· 공부 1개 끝낼 때마다 <b>1골</b> (같은 공부는 한 번만!)</div>'
-    + '<div class="phint">· <b>5골</b>마다 리그 승격: K League 1 → French Ligue 1 → Serie A → Bundesliga → La Liga → Premier League → 🏆 월드 챔피언</div>'
+    + '<div class="phint">· ⏰ <b>목표 시간보다 1분이라도 초과</b>하면 목표달성 실패! 그 공부의 골은 쌓이지 않아요. 딱 맞게 또는 일찍 끝내면 골!</div>'
+    + '<div class="phint">· <b>10골</b>마다 리그 승격: K League 1 → French Ligue 1 → Serie A → Bundesliga → La Liga → Premier League → 🏆 월드 챔피언(60골)</div>'
     + '<div class="phint">· <b>5골</b>마다 선수 카드 1장 영입! (이달의 스쿼드에 쌓여요)</div>'
     + '<div class="phint">· 🔥 해트트릭: 하루 3개 완료 → <b>+1골</b></div>'
     + '<div class="phint">· 🛡️ 클린시트: 한 주 동안 미룬 공부 0개 → <b>+3골</b></div>'
-    + '<div class="phint">· 👑 레전드 카드: 지난달 30골 달성 → 이번 달 시작 <b>+1골</b></div>'
+    + '<div class="phint">· 👑 레전드 카드: 지난달 60골 달성 → 이번 달 시작 <b>+1골</b></div>'
     + '<div class="phint">· ⏱️ 인저리타임: 아빠가 직접 주는 보너스 골</div>'
     + '</div>'
     + '<div class="subbox"><div class="t">🧑‍🔧 아빠가 쓰는 방법</div>'
@@ -1578,12 +1639,12 @@ const DEMO_BANK_KEY = 'junmoBankDemoV4';
 /* 데모용 리그·선수 정의 (GAS와 동일) */
 const D_LEAGUES = [
   { name: 'K League 1',     img: 'https://flagcdn.com/w80/kr.png',     min: 0 },
-  { name: 'French Ligue 1', img: 'https://flagcdn.com/w80/fr.png',     min: 5 },
-  { name: 'Serie A',        img: 'https://flagcdn.com/w80/it.png',     min: 10 },
-  { name: 'Bundesliga',     img: 'https://flagcdn.com/w80/de.png',     min: 15 },
-  { name: 'La Liga',        img: 'https://flagcdn.com/w80/es.png',     min: 20 },
-  { name: 'Premier League', img: 'https://flagcdn.com/w80/gb-eng.png', min: 25 },
-  { name: 'World Champion', img: '',                                   min: 30 }
+  { name: 'French Ligue 1', img: 'https://flagcdn.com/w80/fr.png',     min: 10 },
+  { name: 'Serie A',        img: 'https://flagcdn.com/w80/it.png',     min: 20 },
+  { name: 'Bundesliga',     img: 'https://flagcdn.com/w80/de.png',     min: 30 },
+  { name: 'La Liga',        img: 'https://flagcdn.com/w80/es.png',     min: 40 },
+  { name: 'Premier League', img: 'https://flagcdn.com/w80/gb-eng.png', min: 50 },
+  { name: 'World Champion', img: '',                                   min: 60 }
 ];
 const D_PLAYERS = [
   { n: '이강인', p: 'MF', e: '🎯', t: '왼발 마법사', r: 1 },
@@ -1709,7 +1770,7 @@ function demoBankStats(){
     missions: [
       { id:'hattrick', icon:'🔥', name:'해트트릭', desc:'하루에 공부 3개를 모두 끝내면 +1골', reward:'+1골', done: todayGoals >= 3, progress:'오늘 ' + todayGoals + '골 / 3골' },
       { id:'cleansheet', icon:'🛡️', name:'클린시트', desc:'한 주 동안 미룬 공부가 0개면 +3골', reward:'+3골', done:false, progress:'이번 주 이월 0회 · 완료 4개' },
-      { id:'legend', icon:'👑', name:'레전드 카드', desc:'지난달 월드챔피언(30골)이면 이번 달 시작 +1골', reward:'+1골', done:false, progress:'지난달 30골 도전' },
+      { id:'legend', icon:'👑', name:'레전드 카드', desc:'지난달 월드챔피언(60골)이면 이번 달 시작 +1골', reward:'+1골', done:false, progress:'지난달 60골 도전' },
       { id:'injtime', icon:'⏱️', name:'인저리 타임', desc:'하기 싫었던 과목을 미루지 않고 끝냈을 때 아빠가 주는 보너스', reward:'아빠 픽', done:false, progress:'🔐 아빠 코너에서 지급' }
     ]
   };
@@ -1789,10 +1850,15 @@ function demoApi(p){
         plan.status = '완료';
         plan.progress = plan.targetMinutes ? Math.round(plan.savedMinutes / plan.targetMinutes * 100) : 100;
         plan.progressText = '[' + '#'.repeat(Math.min(Math.round(plan.progress/5),20)) + '] ' + plan.progress + '%';
+        const overTarget = plan.targetMinutes > 0 && plan.savedMinutes > plan.targetMinutes;
         const rows = demoBankLoad();
-        rows.push({date:t, goals:1, type:'공부 완료', memo: plan.title + ' 완료'});
-        demoSaveBank(rows);
-        reward = {awarded:true, goals:1};
+        if(overTarget){
+          reward = {awarded:false, overTarget:true};
+        }else{
+          rows.push({date:t, goals:1, type:'공부 완료', memo: plan.title + ' 완료'});
+          demoSaveBank(rows);
+          reward = {awarded:true, goals:1};
+        }
       }else{
         plan.status = '일시 중지';
       }
@@ -1801,7 +1867,9 @@ function demoApi(p){
         ok: true,
         message: (p.action === 'pause'
           ? add + '분 저장하고 일시정지했어요.'
-          : add + '분 저장! 공부 완료 🎉 (누적 ' + plan.savedMinutes + '분) ⚽ 골 +1!'),
+          : (reward.overTarget
+            ? add + '분 저장! 공부 완료 🎉 (누적 ' + plan.savedMinutes + '분) ⏰ ' + (plan.savedMinutes - plan.targetMinutes) + '분 초과! 목표달성 실패 — 골은 없어요!'
+            : add + '분 저장! 공부 완료 🎉 (누적 ' + plan.savedMinutes + '분) ⚽ 골 +1!')),
         reward: reward, bonuses: [], plan: plan,
         today: t, slots: db.slots, goals: db.goals, plans: list, counts: counts()
       });
