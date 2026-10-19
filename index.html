@@ -1584,6 +1584,7 @@ function openHelp(){
     + '<div class="phint">✏️ <b>이미 만든 계획 고치기</b> : 카드에 적힌 <b>공부 내용(제목)</b> 글씨를 그대로 누르면 그 자리에서 바로 수정돼요! (엔터 또는 밖을 누르면 노션에 자동 저장)</div>'
     + '<div class="phint" style="margin-top:8px">▶ 공부 시작 → ■ 공부 끝 을 누르면, <b>목표 시간 안에(또는 딱 맞게)</b> 끝냈을 때 <b>⚽ 골 1개</b>가 저금통에 쌓여요! (초과하면 골 없음!)</div>'
     + '<div class="phint">· 끝낸 공부는 시간표 <b>맨 아래로 자동 이동</b>돼요. 「✅ 여기부터 오늘 끝낸 공부」 줄을 누르면 <b>접었다 펼치기</b> 할 수 있어요! (접어둔 상태는 이 기기에 기억돼요)</div>'
+    + '<div class="phint">🛡️ <b>v7.1 수정</b> : 접어둔 상태에서 그 시간대의 공부가 전부 완료여도 「✅ 여기부터 오늘 끝낸 공부」 줄이 <b>항상</b> 나타나요! (이전에는 이 경우 줄이 사라져 다시 펼치기가 안 됐어요)</div>'
     + '</div>'
     + '<div class="subbox"><div class="t">⚽ 골은 이렇게 쌓여요</div>'
     + '<div class="phint">· 공부 1개 끝낼 때마다 <b>1골</b> (같은 공부는 한 번만!)</div>'
@@ -2043,6 +2044,37 @@ async function saveTitleNow(id){
 
 $('board').addEventListener('click', onBoardClickForTitle);   /* 카드가 다시 그려져도 그대로 작동 */
 
+/* =========================================================================
+   [v7.1 추가] 완료 세션 접기/펼치기 — "구분선이 사라지는" 상태 복구
+   -------------------------------------------------------------------------
+   · 원인: 기존 withDoneDivider 는 "구분선 앞에 이미 그려진 카드가 있을 때(out.length)"
+           만 구분선을 그렸어요. 그런데 접힌 상태(▼)에서는 완료 카드가 그려지지 않으므로
+           그 시간대의 공부가 '전부 완료'이면 out.length 가 0 인 채 끝나
+           → 구분선(접기/펼치기 버튼) 자체가 그려지지 않아 다시 펼칠 수 없었어요.
+           (코드 유실은 아니고, 어제 '접어두기'를 한 상태 + 오늘 계획이 전부 완료인
+            조건에서 처음 드러난 숨은 버그예요. 기존 함수 소스는 위에 그대로 남아요.)
+   · 방법: 같은 이름의 함수를 파일 뒤쪽에 "추가"하면 자바스크립트 규칙상 나중 것이 사용돼요.
+           (기존 줄은 한 글자도 수정/삭제하지 않는 방식)
+   · 바뀐 것(유일한 차이): 구분선 조건에서 'out.length' 요구 제거
+           → 완료 카드가 있는 모든 시간대에서 구분선이 항상 첫 완료 카드 바로 위에 나타나요.
+   ========================================================================= */
+function withDoneDivider(sorted){
+  const out = [];
+  let divDone = false;
+  const folded = isDoneFolded();
+  const doneCnt = sorted.filter(p => p.status === '완료').length;
+  sorted.forEach(p => {
+    if(!divDone && p.status === '완료'){   /* ← v7.1 : out.length 조건 제거 (구분선 항상 표시) */
+      out.push('<div class="doneDivider" role="button" tabindex="0" aria-pressed="' + folded + '" onclick="toggleDoneFold()" onkeydown="if(event.key===\'Enter\')toggleDoneFold()">✅ 여기부터 오늘 끝낸 공부'
+        + '<span class="dvbtn">' + (folded ? '▼ 펼쳐서 보기 ' : '▲ 접어서 숨기기 ') + doneCnt + '개</span></div>');
+      divDone = true;
+    }
+    if(folded && p.status === '완료') return;   /* 접힘 상태에서는 완료 카드 숨김 */
+    out.push(cardHtml(p));
+  });
+  return out.join('');
+}
+
 /* ---------- 시작 ---------- */
 (function init(){
   ensureDatePick();
@@ -2057,6 +2089,7 @@ $('board').addEventListener('click', onBoardClickForTitle);   /* 카드가 다�
 })();
 </script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
