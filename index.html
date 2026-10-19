@@ -2075,6 +2075,61 @@ function withDoneDivider(sorted){
   return out.join('');
 }
 
+/* =========================================================================
+   [v7.2 추가] 완료 세션 구분선 위치 변경 — 시간대 머리글 "위"로 이동
+   -------------------------------------------------------------------------
+   · 요청: 「✅ 여기부터 오늘 끝낸 공부 / 접어서 숨기기」 구분선 줄이
+           시간대 머리글(『🕘 시간대 이름』 + 『계획 N개 · 실제시간/목표시간』) 행
+           "아래"가 아니라 그 "위"에 나오게 해달라는 요청이에요.
+   · 원인: 기존 todayBoard 는 시간대 머리글(grouphead)을 먼저 그린 뒤에
+           withDoneDivider 를 불렀기 때문에, 구분선이 항상 머리글 아래에 붙었어요.
+   · 방법: 같은 이름의 함수를 파일 뒤쪽에 "추가"하면 자바스크립트 규칙상 나중 것이
+           사용돼요. (기존 todayBoard 소스는 위에 그대로 남아요. 수정/삭제 없음)
+   · 바뀐 것(유일한 차이): 그리는 순서만 바꿔요.
+           시간대 블록 안에서 → ①구분선(+완료 전 카드) → ②시간대 머리글 → ③완료 카드
+           구분선 모양·접기/펼치기 동작·접힘 기억은 기존 함수들 그대로 재사용해요.
+   ========================================================================= */
+function slotBoardPart(list, headHtml){
+  const sorted = list.slice().sort(planOrder);
+  const iDone = sorted.findIndex(p => p.status === '완료');   /* 첫 완료 카드 위치 */
+  if(iDone < 0) return headHtml + withDoneDivider(sorted);    /* 완료 없으면 기존과 동일 */
+  const doneCnt = sorted.filter(p => p.status === '완료').length;
+  const folded = isDoneFolded();
+  const divider = '<div class="doneDivider" role="button" tabindex="0" aria-pressed="' + folded + '" onclick="toggleDoneFold()" onkeydown="if(event.key===\'Enter\')toggleDoneFold()">✅ 여기부터 오늘 끝낸 공부'
+    + '<span class="dvbtn">' + (folded ? '▼ 펼쳐서 보기 ' : '▲ 접어서 숨기기 ') + doneCnt + '개</span></div>';
+  /* 구분선 → 완료 전 카드 → 시간대 머리글 → 완료 카드 (접힘 상태면 완료 카드 숨김) */
+  return divider
+    + sorted.slice(0, iDone).map(cardHtml).join('')
+    + headHtml
+    + (folded ? '' : sorted.slice(iDone).map(cardHtml).join(''));
+}
+function todayBoard(){
+  const bySlot = new Map();
+  const noSlot = [];
+  plans.forEach(p => {
+    if(!p.slotId){ noSlot.push(p); return; }
+    if(!bySlot.has(p.slotId)) bySlot.set(p.slotId, []);
+    bySlot.get(p.slotId).push(p);
+  });
+  const html = [];
+  slots.forEach(s => {
+    const list = bySlot.get(s.id) || [];
+    if(!list.length) return;
+    const target = list.reduce((a,p) => a + (Number(p.targetMinutes)||0), 0);
+    const saved = list.reduce((a,p) => a + (Number(p.savedMinutes)||0), 0);
+    const headHtml = '<div class="grouphead"><div><div class="gt">🕘 ' + esc(s.name) + '</div>'
+      + '<div class="gd">계획 ' + list.length + '개 · ' + saved + '/' + target + '분</div></div>'
+      + '<div class="gd">' + (target ? Math.min(100,Math.round(saved/target*100)) : 0) + '%</div></div>';
+    html.push(slotBoardPart(list, headHtml));   /* v7.2 : 구분선이 머리글 위로 */
+  });
+  if(noSlot.length){
+    html.push('<div class="grouphead"><div><div class="gt">📥 시간대 미배정 (이월된 공부)</div><div class="gd">시간대를 정해 주면 위 시간표에 자리를 잡아요</div></div></div>');
+    html.push(withDoneDivider(noSlot.slice().sort(planOrder)));
+  }
+  if(!html.length) return '<div class="empty"><b>이 날은 시간대에 배치된 계획이 없어요</b>＋ 새 공부 계획으로 공부를 만들어 보세요!</div>';
+  return html.join('');
+}
+
 /* ---------- 시작 ---------- */
 (function init(){
   ensureDatePick();
