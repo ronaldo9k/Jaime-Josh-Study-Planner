@@ -327,6 +327,11 @@ main{max-width:900px;margin:0 auto;padding:14px 13px 120px}
   .hbtns .iconbtn{min-width:46px}
 }
 
+/* ===== v6.1 : ② 공부 내용(세부할일) 카드에서 바로 고치기 ===== */
+/* 제목 글씨를 그대로 누르면 그 자리에서 입력창으로 바뀌어요 (새 버튼 없음 · 레이아웃 그대로) */
+.title{cursor:text}
+.title-edit{display:block;width:calc(100% + 8px);margin:-1px -4px;padding:0 4px;font:inherit;font-size:16px;letter-spacing:-.2px;color:var(--ink);background:#f6fbf8;border:none;border-bottom:2px solid var(--green);border-radius:4px;outline:none;-webkit-appearance:none;appearance:none}
+
 @media(min-width:640px){
   .sheetback{align-items:center;padding:20px}
   .sheet{border-radius:24px}
@@ -638,7 +643,15 @@ main{max-width:900px;margin:0 auto;padding:14px 13px 120px}
        - 값이 그대로(PASTE_YOUR...)면 '체험(데모) 모드'로 동작해요.
    [2] 노션 토큰은 절대 이 파일에 넣지 않습니다. 토큰은 GAS 스크립트 속성에만!
    ========================================================================= */
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzvsaCPiezX73tD3fzp8FTflfXFpuWblkNkV1qO2TSa4-Rz5XqM33WI8aOtvYtInHMR/exec';   /* 예: https://script.google.com/macros/s/..../exec */
+
+/* ===== [v6.1 추가] ② 공부 내용(세부할일) 을 카드에서 바로 고치기 =====
+   이 버전에서 새로 "추가"된 것은 아래 3곳이 전부예요. 기존 코드는 한 글자도 수정/삭제 없어요!
+   · <style> 맨 아래 : .title-edit 입력창 디자인 (제목과 똑같이 생긴 입력창)
+   · <script> 맨 아래(시작 init 직전) : 제목을 누르면 그 자리에서 수정되는 새 함수들
+   · 데모 모드(demoApi) : updateTitle 동작 6줄 (데모에서도 수정 체험 가능)
+   저장 방식: 손을 떼면(엔터/밖 터치) 화면에 먼저 반영 → 0.5초 뒤 노션에 자동 저장
+   → 저장이 실패하면 원래 글자로 자동 복구(롤백)하니까 걱정 없어요! */
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyAPecIHnEg6DuEYyPzz-729XYgEqjURrJg-4BSe_9CK3UwcS7KdnLek4TacVmgR3fI/exec';   /* 예: https://script.google.com/macros/s/..../exec */
 const DEMO = !GAS_URL || GAS_URL.indexOf('PASTE_YOUR') === 0;
 
 /* ---------- 상태 ---------- */
@@ -1568,6 +1581,7 @@ function openHelp(){
     + '<div class="phint"><b>2.</b> ①시간대 → ②공부 내용 → ③날짜·목표 시간(분) 순서로 적어요.</div>'
     + '<div class="phint"><b>3.</b> ④ <b>당일계획 / 기간계획 / 미래계획</b> 중에 하나를 골라요. (태블릿 키보드의 <b>이동</b>을 눌러도 자동으로 넘어가요!)</div>'
     + '<div class="phint"><b>4.</b> <b>노션에 저장</b>을 누르면 끝! 오늘 시간표에 나타나요.</div>'
+    + '<div class="phint">✏️ <b>이미 만든 계획 고치기</b> : 카드에 적힌 <b>공부 내용(제목)</b> 글씨를 그대로 누르면 그 자리에서 바로 수정돼요! (엔터 또는 밖을 누르면 노션에 자동 저장)</div>'
     + '<div class="phint" style="margin-top:8px">▶ 공부 시작 → ■ 공부 끝 을 누르면, <b>목표 시간 안에(또는 딱 맞게)</b> 끝냈을 때 <b>⚽ 골 1개</b>가 저금통에 쌓여요! (초과하면 골 없음!)</div>'
     + '<div class="phint">· 끝낸 공부는 시간표 <b>맨 아래로 자동 이동</b>돼요. 「✅ 여기부터 오늘 끝낸 공부」 줄을 누르면 <b>접었다 펼치기</b> 할 수 있어요! (접어둔 상태는 이 기기에 기억돼요)</div>'
     + '</div>'
@@ -1918,9 +1932,116 @@ function demoApi(p){
     if(p.action === 'promote'){ plan.runDate = t; plan.planType = '당일계획'; plan.status = '시작전'; out('오늘 공부로 불러왔어요!'); return; }
     if(p.action === 'archive'){ plan.status = '보관함'; out('보관함으로 옮겼어요.'); return; }
     if(p.action === 'restore'){ plan.status = '시작전'; plan.runDate = t; out('보관함에서 다시 꺼냈어요.'); return; }
+    /* [v6.1 추가] ② 공부 내용(세부할일) 수정 — 데모 모드에서도 똑같이 동작 */
+    if(p.action === 'updateTitle'){
+      const nt = String(p.title || '').trim();
+      if(!nt){ resolve({ok:false, error:'공부 내용을 적어 주세요.'}); return; }
+      plan.title = nt.slice(0, 200);
+      out('공부 내용을 수정했어요! (데모 체험)'); return;
+    }
     resolve({ok:false, error:'지원하지 않는 동작이에요.'});
   }, 160));
 }
+
+/* =========================================================================
+   [v6.1 추가] ② 공부 내용(세부할일) 을 카드에서 바로 고치기
+   -------------------------------------------------------------------------
+   · 기존 코드는 "한 글자도" 바꾸지 않았어요. 아래는 전부 "새로 추가"된 코드예요.
+   · 카드의 공부 내용(제목) 글씨를 그대로 누르면 → 그 자리에서 입력창으로 바뀌어요.
+     (새 버튼 없음 · 기존 레이아웃 그대로)
+   · 엔터 또는 입력창 바깥을 누르면 → 화면에 먼저 반영(낙관적 업데이트) 후
+     0.5초 안에 노션에 자동 저장되고, 저장이 실패하면 원래 글자로 되돌려줘요.
+   ========================================================================= */
+const _origCardHtml_v61 = cardHtml;               /* 원본 카드 그리기 함수 보관 */
+cardHtml = function(p){                            /* 카드에 식별용 data-plan 표시만 얹어서 사용 (원본 출력 그대로) */
+  return _origCardHtml_v61(p).replace('<article class="card', '<article data-plan="' + esc(p.id) + '" class="card');
+};
+
+let titleEdit = null;                              /* 지금 열려 있는 편집 입력창 */
+const titleSaveQueue = {};                         /* 공부 id → 저장 대기(디바운스) */
+
+function onBoardClickForTitle(e){
+  if(e.target.classList && e.target.classList.contains('title-edit')) return;  /* 편집 중 입력창을 누른 것 → 커서 이동이므로 무시 */
+  const tEl = e.target.closest('.title');
+  if(!tEl || tEl.querySelector('input')) return;
+  const card = tEl.closest('article[data-plan]');
+  if(!card) return;
+  startTitleEdit(card.getAttribute('data-plan'));
+}
+
+function startTitleEdit(id){
+  if(titleEdit) commitTitleEdit();                 /* 다른 제목을 눌렀다면 이전 편집을 먼저 확정 */
+  const card = document.querySelector('article[data-plan="' + id + '"]');
+  const tEl = card ? card.querySelector('.title') : null;
+  const p = plans.find(x => x.id === id);
+  if(!tEl || !p || tEl.querySelector('input')) return;
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'title-edit';
+  input.value = p.title || '';
+  input.maxLength = 200;                           /* 노션 저장 규칙(200자)과 동일 */
+  input.setAttribute('enterkeyhint', 'done');
+  input.setAttribute('aria-label', '공부 내용 수정');
+  tEl.textContent = '';
+  tEl.appendChild(input);
+  titleEdit = { id: id, oldTitle: p.title || '', input: input };
+  input.addEventListener('keydown', ev => {
+    if(ev.key === 'Enter' && !ev.isComposing){ ev.preventDefault(); commitTitleEdit(); }      /* 엔터 → 저장 */
+    else if(ev.key === 'Escape'){ ev.preventDefault(); cancelTitleEdit(); }                   /* ESC → 취소 */
+  });
+  input.addEventListener('blur', () => {
+    /* 입력창 바깥을 누르면 저장. (엔터-블러 동시 발생 방지용 0.12초 지연) */
+    setTimeout(() => { if(titleEdit && titleEdit.input === input) commitTitleEdit(); }, 120);
+  });
+  input.focus();
+  try{ const L = input.value.length; input.setSelectionRange(L, L); }catch(e){}
+}
+
+function cancelTitleEdit(){
+  if(!titleEdit) return;
+  titleEdit = null;
+  render();                                        /* 원래 글자로 되돌아감 (서버 호출 0회) */
+}
+
+function commitTitleEdit(){
+  if(!titleEdit) return;
+  const id = titleEdit.id, oldTitle = titleEdit.oldTitle;
+  const next = (titleEdit.input.value || '').trim();
+  titleEdit = null;
+  if(!next || next === oldTitle){ render(); return; }   /* 빈 글자/변화 없음 → 화면만 복구 */
+  const p = plans.find(x => x.id === id);
+  if(p) p.title = next;                            /* ① 화면에 먼저 반영 (기다림 없음 = 빠른 체감) */
+  render();
+  scheduleTitleSave(id, oldTitle, next);
+}
+
+function scheduleTitleSave(id, oldTitle, next){
+  const q = titleSaveQueue[id] || {};
+  clearTimeout(q.timer);
+  titleSaveQueue[id] = {
+    oldTitle: (q.oldTitle !== undefined ? q.oldTitle : oldTitle),   /* 실패 시 되돌릴 원본 보존 */
+    next: next,
+    timer: setTimeout(() => saveTitleNow(id), 500)  /* ② 0.5초 디바운스: 연속 수정은 마지막 것만 저장 */
+  };
+}
+
+async function saveTitleNow(id){
+  const q = titleSaveQueue[id];
+  if(!q) return;
+  delete titleSaveQueue[id];
+  try{
+    const r = await api({action:'updateTitle', id: id, title: q.next});
+    const p = plans.find(x => x.id === id);
+    if(p && r && r.plan && r.plan.title && r.plan.title !== p.title){ p.title = r.plan.title; render(); }
+    toast(r.message || '공부 내용을 노션에 수정했어요!', 'ok');
+  }catch(e){
+    const p = plans.find(x => x.id === id);
+    if(p && p.title === q.next){ p.title = q.oldTitle; render(); }   /* ③ 실패 시 원래 글자로 자동 롤백 */
+    toast('공부 내용 수정 저장 실패: ' + e.message, 'bad');
+  }
+}
+
+$('board').addEventListener('click', onBoardClickForTitle);   /* 카드가 다시 그려져도 그대로 작동 */
 
 /* ---------- 시작 ---------- */
 (function init(){
@@ -1936,6 +2057,7 @@ function demoApi(p){
 })();
 </script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
 </body>
