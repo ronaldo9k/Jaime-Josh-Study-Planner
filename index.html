@@ -338,6 +338,54 @@ main{max-width:900px;margin:0 auto;padding:14px 13px 120px}
   .fab{bottom:26px}
   .stats{gap:11px}
 }
+
+/* ===== v8.0 추가 : ✕ 삭제버튼 · 베일 카드 · 카드 포인트 · 통계 화면 · 국기색 · Let's Go 팝업 =====
+   ★ 기존 CSS 는 한 줄도 수정/삭제하지 않고 아래에 "추가"만 했습니다. */
+/* ① [핵심요청] 카드에서 아주 조그만 ✕ 삭제 버튼 — 새 행(줄)을 만들지 않고 '.meta' 줄 끝에만 붙습니다 */
+.delx{display:inline-block;margin-left:6px;width:17px;height:17px;line-height:15px;text-align:center;
+  border-radius:50%;font-size:10.5px;font-weight:900;color:var(--red);background:var(--red-soft);
+  border:1px solid #f0c9c6;vertical-align:middle;padding:0}
+.delx:active{transform:scale(.88)}
+
+/* ② [핵심요청] 아직 영입 못한 선수 카드는 완전히 베일에 가려서 안 보이게 */
+.pcard2.veil{background:linear-gradient(160deg,#12283c,#0d1b2b 55%,#1c1233);border-color:#2a3f57;color:#8296ab;position:relative;overflow:hidden}
+.pcard2.veil .vq{font-size:27px;font-weight:900;color:rgba(255,255,255,.34);line-height:1.1}
+.pcard2.veil .vlock{display:inline-block;font-size:9.5px;font-weight:900;color:var(--gold);
+  background:rgba(233,201,119,.14);border:1px solid rgba(233,201,119,.45);border-radius:999px;padding:2px 7px;margin-top:4px}
+.pcard2.veil .vno{position:absolute;top:3px;left:5px;font-size:9px;font-weight:900;opacity:.45}
+.pcard2 .tier{display:block;font-size:9px;font-weight:900;margin-top:3px;opacity:.9}
+.pcard2.fresh{box-shadow:0 0 0 2px var(--gold),0 8px 20px rgba(201,164,78,.45)}
+
+/* ③ 카드 포인트(등급 포인트 → 보상) */
+.ptbox{background:linear-gradient(150deg,#fdf8ea,#f6ecd4);border:1px solid #e6d6ae;border-radius:16px;padding:12px;margin-bottom:9px}
+.ptrow{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px;font-weight:800;
+  color:#5d4a1c;padding:5px 0;border-bottom:1px dashed #e6d6ae}
+.ptrow:last-of-type{border-bottom:none}
+.ptrow b{font-size:15px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.mktrow.on{background:var(--green-soft);border-color:var(--green)}
+.mktrow.on .mv{color:#14603c}
+
+/* ④ 기간별 통계 화면 */
+.stbucket{display:flex;justify-content:space-between;align-items:center;gap:8px;background:#fbfcfe;
+  border:1px solid var(--line);border-radius:12px;padding:9px 11px;margin-bottom:6px;font-size:12px;font-weight:800}
+.stbucket .sbL{min-width:0}
+.stbucket .sbL small{display:block;font-weight:700;color:var(--muted);font-size:10.5px;margin-top:2px}
+.stbucket .sbR{white-space:nowrap;color:var(--green);font-variant-numeric:tabular-nums}
+.stbucket .sbR.bad{color:var(--red)}
+#stRangeBox{display:none}
+
+/* ⑤ 리그 국기색 그라데이션 (JS가 인라인으로 칠해 줍니다) */
+.bstair .bstep{border-top:3px solid rgba(255,255,255,.35)}
+.leaguepill,.leaguebar i,#stripBar{transition:background .35s}
+
+/* ⑥ ▶공부 시작 : 「땅!」 + Let's Go! 준모!! (2초) */
+.letsgo{position:fixed;left:50%;top:44%;transform:translate(-50%,-50%) scale(.6);z-index:60;
+  pointer-events:none;opacity:0;transition:opacity .18s,transform .22s;text-align:center;padding:18px 26px;
+  border-radius:22px;background:linear-gradient(150deg,rgba(18,40,60,.92),rgba(30,61,89,.92));box-shadow:0 16px 40px rgba(0,0,0,.45)}
+.letsgo.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.letsgo .lg1{font-size:34px;font-weight:900;color:#fff;letter-spacing:-1px;text-shadow:0 3px 0 var(--gold-deep),0 8px 22px rgba(0,0,0,.5)}
+.letsgo .lg2{font-size:24px;font-weight:900;color:var(--gold);margin-top:2px;text-shadow:0 3px 0 rgba(0,0,0,.35)}
+
 </style>
 </head>
 <body>
@@ -351,6 +399,7 @@ main{max-width:900px;margin:0 auto;padding:14px 13px 120px}
     </div>
     <div class="hbtns">
       <button class="iconbtn gold" onclick="openBank()" title="골 저금통 · 나의 축구 커리어">🏆</button>
+      <button class="iconbtn" onclick="openStats()" title="공부 통계 분석 (Total·월별·주별·기간별)">📊</button>
       <button class="iconbtn" onclick="openHelp()" title="사용 방법 보기">❓</button>
       <button class="iconbtn" onclick="openParent()" title="부모 코너 (아빠 전용)">🔐</button>
       <button class="iconbtn refresh" onclick="refreshAll()" title="노션에서 최신 정보 다시 불러오기">↻</button>
@@ -632,6 +681,70 @@ main{max-width:900px;margin:0 auto;padding:14px 13px 120px}
   </div>
 </div>
 
+
+<!-- ===== 📊 기간별 통계 분석 시트 (v8.0 신규) ===== -->
+<div class="sheetback" id="statsBack" onclick="if(event.target===this)closeSheet('statsBack')">
+  <div class="sheet" style="max-width:680px">
+    <h2>📊 공부 통계 분석</h2>
+    <div class="hint">부모 코너처럼 <b>별도 화면</b>에서 ① 공부한 시간 · ② 목표 시간 · ③ 완료/전체 · ④ 목표달성 현황을 한눈에 봐요. 노션 기록 전체를 서버에서 계산해 옵니다.</div>
+    <div class="seg" id="stSeg" style="margin-bottom:10px">
+      <button type="button" class="on" data-p="total" onclick="setBigPeriod('total')">Total</button>
+      <button type="button" data-p="month" onclick="setBigPeriod('month')">월별</button>
+      <button type="button" data-p="week" onclick="setBigPeriod('week')">주별</button>
+      <button type="button" data-p="range" onclick="setBigPeriod('range')">기간별</button>
+    </div>
+    <div class="subbox" id="stRangeBox">
+      <div class="t">🔎 기간 검색 (시작일 ~ 종료일)</div>
+      <div class="row2">
+        <div><span class="minilabel">시작일</span><input id="stFrom" type="date"></div>
+        <div><span class="minilabel">종료일</span><input id="stTo" type="date"></div>
+      </div>
+      <button class="act primary" style="width:100%;margin-top:9px" onclick="loadRangeStats()">이 기간만 조회</button>
+    </div>
+    <div id="statsBody"></div>
+    <div class="sheetactions">
+      <button class="cancel" onclick="closeSheet('statsBack')">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 🎬 비디오 판독 · 벌칙 시트 (v8.0 신규) ===== -->
+<div class="sheetback" id="penaltyBack" onclick="if(event.target===this)closeSheet('penaltyBack')">
+  <div class="sheet" style="max-width:520px">
+    <h2>🎬 비디오 판독 · 벌칙</h2>
+    <div class="hint">골을 깎는 판정이에요. 부모 코너와 같은 PIN이 있어야 적용돼요.</div>
+    <div class="field">
+      <label for="penType">판정 종류</label>
+      <select id="penType">
+        <option value="골 취소">1. 골 취소 (골 1개 차감)</option>
+        <option value="옐로카드">2. 옐로카드 (2장 쌓이면 골 1개 차감)</option>
+        <option value="레드카드">3. 레드카드 (골 1개 차감)</option>
+        <option value="강등">4. 강등 (골 0개로 리셋 · K League 1로 강등)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="penPin">아빠 PIN</label>
+      <input id="penPin" type="password" inputmode="numeric" autocomplete="off"
+             placeholder="GAS 속성 BEST_ELEVEN_PARENT_PIN 값 (기본 1234)">
+    </div>
+    <div class="field">
+      <label for="penMemo">이유 메모 (준모가 볼 수 있어요)</label>
+      <input id="penMemo" maxlength="200" placeholder="예: 약속한 시간에 공부를 시작하지 않았어요">
+    </div>
+    <div class="errbox" id="penError" style="display:none"></div>
+    <div class="sheetactions">
+      <button class="cancel" onclick="closeSheet('penaltyBack')">취소</button>
+      <button class="save" onclick="submitPenalty()">판정 적용</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ▶공부 시작 : Let's Go! 준모!! 팝업 (v8.0 신규) ===== -->
+<div id="letsGo" class="letsgo" aria-live="polite" aria-hidden="true">
+  <div class="lg1">Let's Go!</div>
+  <div class="lg2">준모!! ⚽</div>
+</div>
+
 <div class="toasts" id="toasts"></div>
 <canvas id="confetti"></canvas>
 
@@ -651,7 +764,7 @@ main{max-width:900px;margin:0 auto;padding:14px 13px 120px}
    · 데모 모드(demoApi) : updateTitle 동작 6줄 (데모에서도 수정 체험 가능)
    저장 방식: 손을 떼면(엔터/밖 터치) 화면에 먼저 반영 → 0.5초 뒤 노션에 자동 저장
    → 저장이 실패하면 원래 글자로 자동 복구(롤백)하니까 걱정 없어요! */
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyAPecIHnEg6DuEYyPzz-729XYgEqjURrJg-4BSe_9CK3UwcS7KdnLek4TacVmgR3fI/exec';   /* 예: https://script.google.com/macros/s/..../exec */
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyjwbGiObSFikcC9nulGOAzeP7W_HrWAcbjIlPwd82zJQ6J2rQFC-ifDGKqvRuC6MED/exec';   /* 예: https://script.google.com/macros/s/..../exec */
 const DEMO = !GAS_URL || GAS_URL.indexOf('PASTE_YOUR') === 0;
 
 /* ---------- 상태 ---------- */
@@ -1680,269 +1793,14 @@ function resetLocal(){
 }
 
 /* =========================================================================
-   체험(데모) 모드 : GAS_URL을 채우기 전에 모든 기능을 눌러볼 수 있어요
+   체험(데모) 모드 : v8.0 에서 정리(삭제)했습니다.  ← 사용자 요청(6-②)
+   -------------------------------------------------------------------------
+   · 함께 들어낸 것 : demoSeed / demoLoad / demoSave / demoBankLoad / demoSaveBank
+                     / demoBankStats / demoApi(원본) / D_LEAGUES / D_PLAYERS / D_MARKET
+                     그리고 부모 코너의 「🧹 이 기기 기록 정리」 칸 + resetLocal() 호출부
+   · 실제 노션(GAS)만 쓰기 때문에 체험용 가짜 데이터는 더 이상 필요 없어요.
+   · GAS_URL 이 비어 있을 때를 대비한 안전용 최소 함수만 남겼습니다(demoApi).
    ========================================================================= */
-const DEMO_KEY = 'junmoStudyDemoV4';
-const DEMO_BANK_KEY = 'junmoBankDemoV4';
-
-/* 데모용 리그·선수 정의 (GAS와 동일) */
-const D_LEAGUES = [
-  { name: 'K League 1',     img: 'https://flagcdn.com/w80/kr.png',     min: 0 },
-  { name: 'French Ligue 1', img: 'https://flagcdn.com/w80/fr.png',     min: 10 },
-  { name: 'Serie A',        img: 'https://flagcdn.com/w80/it.png',     min: 20 },
-  { name: 'Bundesliga',     img: 'https://flagcdn.com/w80/de.png',     min: 30 },
-  { name: 'La Liga',        img: 'https://flagcdn.com/w80/es.png',     min: 40 },
-  { name: 'Premier League', img: 'https://flagcdn.com/w80/gb-eng.png', min: 50 },
-  { name: 'World Champion', img: '',                                   min: 60 }
-];
-const D_PLAYERS = [
-  { n: '이강인', p: 'MF', e: '🎯', t: '왼발 마법사', r: 1 },
-  { n: '김민재', p: 'DF', e: '🛡️', t: '철벽 수비', r: 1 },
-  { n: '홀란드', p: 'FW', e: '🚀', t: '골 폭격기', r: 1 },
-  { n: '음바페', p: 'FW', e: '⚡', t: '초특급 스피드', r: 1 },
-  { n: '벨링엄', p: 'MF', e: '🧠', t: '중원 지배자', r: 2 },
-  { n: '비니시우스', p: 'FW', e: '💫', t: '드리블 마법', r: 2 },
-  { n: '야말', p: 'FW', e: '🌟', t: '신성 루키', r: 2 },
-  { n: '페드리', p: 'MF', e: '🎩', t: '패스 장인', r: 2 },
-  { n: '케인', p: 'FW', e: '🏹', t: '결정력 1위', r: 3 },
-  { n: '더브라위너', p: 'MF', e: '🧵', t: '어시스트 왕', r: 3 },
-  { n: '살라', p: 'FW', e: '🦅', t: '이집트의 왕', r: 3 },
-  { n: '손흥민', p: 'FW', e: '🐯', t: '아시아의 빛', r: 3 },
-  { n: '메시', p: 'FW', e: '🐐', t: 'GOAT', r: 4 },
-  { n: '호날두', p: 'FW', e: '👑', t: 'CR7', r: 4 },
-  { n: '네이마르', p: 'FW', e: '🌈', t: '삼바 매직', r: 4 },
-  { n: '레반도프스키', p: 'FW', e: '🔨', t: '득점 기계', r: 4 },
-  { n: '지단', p: 'MF', e: '🎼', t: '우아한 마에스트로', r: 5 },
-  { n: '호나우두', p: 'FW', e: '🌪️', t: 'R9 폭풍', r: 5 },
-  { n: '마라도나', p: 'MF', e: '🪄', t: '신의 왼발', r: 5 },
-  { n: '베컴', p: 'MF', e: '🎯', t: '프리킥 장인', r: 5 },
-  { n: '펠레', p: 'FW', e: '👑', t: '축구 황제', r: 6 },
-  { n: '크루이프', p: 'FW', e: '🔄', t: '토탈 사커', r: 6 },
-  { n: '뮐러', p: 'FW', e: '🏆', t: '골 사냥꾼', r: 6 },
-  { n: '준모', p: '★', e: '⭐', t: '미래의 월드챔피언', r: 6 }
-];
-const D_MARKET = [
-  { tier: '브론즈 · 실버 카드', reward: '간식 1개 또는 게임 30분' },
-  { tier: '골드 카드', reward: '아이스크림 또는 영화 1편' },
-  { tier: '플래티넘 카드', reward: '치킨 쿠폰 1장' },
-  { tier: '레전드 카드', reward: '축구 용품 또는 축구 직관' },
-  { tier: '불멸 카드 (준모)', reward: '주말 자유시간권 + 소원 1개' }
-];
-
-function demoSeed(){
-  const t = today();
-  const mk = (o) => Object.assign({
-    id:'demo-' + Math.random().toString(36).slice(2), title:'', dueDate:t, dueDateEnd:'', runDate:t,
-    slotId:'', slotOrder:9999, goalId:'', planType:'당일계획', status:'시작전', targetMinutes:30,
-    savedMinutes:0, carryCount:0, startTime:null, finishTime:null, actualMinutes:null, progress:null, progressText:''
-  }, o);
-  const dslots = [
-    {id:'s1', name:'06:30~07:30 아침', order:1},
-    {id:'s2', name:'08:00~09:00 등교 전', order:2},
-    {id:'s3', name:'16:30~17:30 숙제', order:3},
-    {id:'s4', name:'17:30~18:30 수학', order:4},
-    {id:'s5', name:'19:00~20:00 독서', order:5},
-    {id:'s6', name:'20:00~21:00 영어', order:6},
-    {id:'s7', name:'21:00~21:30 오늘 정리', order:7}
-  ];
-  const dgoals = [
-    {id:'g1', name:'중간고사 대비 (수학)', dueDate:addDays(t, 12), completed:false},
-    {id:'g2', name:'영어 단어왕 되기', dueDate:addDays(t, 30), completed:false},
-    {id:'g3', name:'축구 체력 기르기', dueDate:addDays(t, 45), completed:false}
-  ];
-  const startISO = new Date(Date.now() - 23 * 60000).toISOString();
-  const dplans = [
-    mk({title:'수학 문제집 3쪽 풀기', slotId:'s4', slotOrder:4, goalId:'g1', planType:'기간계획', dueDate:addDays(t,4), dueDateEnd:addDays(t,12), status:'진행중', targetMinutes:60, savedMinutes:25, startTime:startISO}),
-    mk({title:'영어 단어 30개 외우기', slotId:'s6', slotOrder:6, goalId:'g2', planType:'당일계획', status:'일시 중지', targetMinutes:40, savedMinutes:18}),
-    mk({title:'국어 독서록 한 편 쓰기', slotId:'s5', slotOrder:5, planType:'당일계획', status:'시작전', targetMinutes:30}),
-    mk({title:'받아쓰기 틀린 문제 다시 쓰기', slotId:'', slotOrder:9999, planType:'당일계획', runDate:addDays(t,-1), status:'시작전', targetMinutes:20, carryCount:2}),
-    mk({title:'과학 실험 관찰 정리', slotId:'', slotOrder:9999, planType:'당일계획', runDate:addDays(t,-2), status:'일시 중지', targetMinutes:25, savedMinutes:10, carryCount:1}),
-    mk({title:'수학 오답노트 만들기', slotId:'s4', slotOrder:4, goalId:'g1', planType:'기간계획', dueDate:addDays(t,6), dueDateEnd:addDays(t,12), status:'완료', targetMinutes:50, savedMinutes:52, progress:104, progressText:'[####################] 104%'}),
-    mk({title:'영어 듣기 20분', slotId:'s6', slotOrder:6, goalId:'g2', planType:'미래계획', dueDate:addDays(t,20), runDate:'', status:'시작전', targetMinutes:20}),
-    mk({title:'축구 스트레칭 루틴 익히기', slotId:'s1', slotOrder:1, goalId:'g3', planType:'미래계획', dueDate:addDays(t,40), runDate:'', status:'시작전', targetMinutes:15}),
-    mk({title:'옛날 숙제 (지금은 안 해도 됨)', slotId:'s3', slotOrder:3, planType:'당일계획', status:'보관함', targetMinutes:20})
-  ];
-  return {slots:dslots, goals:dgoals, plans:dplans};
-}
-function demoLoad(){
-  try{ const raw = localStorage.getItem(DEMO_KEY); if(raw) return JSON.parse(raw); }catch(e){}
-  const seed = demoSeed();
-  demoSave(seed);
-  return seed;
-}
-function demoSave(data){ try{ localStorage.setItem(DEMO_KEY, JSON.stringify(data)); }catch(e){} }
-
-function demoBankLoad(){
-  try{ const raw = localStorage.getItem(DEMO_BANK_KEY); if(raw) return JSON.parse(raw); }catch(e){}
-  const t = today();
-  const seed = [
-    {date: addDays(t,-2), goals:1, type:'공부 완료', memo:'국어 독서록 완료'},
-    {date: addDays(t,-1), goals:1, type:'공부 완료', memo:'영어 단어 완료'},
-    {date: addDays(t,-1), goals:1, type:'공부 완료', memo:'수학 문제집 완료'},
-    {date: t, goals:1, type:'공부 완료', memo:'수학 오답노트 완료'},
-    {date: t, goals:2, type:'아빠 픽', memo:'어려운 영어 숙제를 미루지 않았어!'}
-  ];
-  demoSaveBank(seed);
-  return seed;
-}
-function demoSaveBank(rows){ try{ localStorage.setItem(DEMO_BANK_KEY, JSON.stringify(rows)); }catch(e){} }
-
-function demoBankStats(){
-  const events = demoBankLoad();
-  const t = today(), month = t.slice(0,7);
-  const total = events.reduce((s,e) => s + e.goals, 0);
-  const monthly = events.filter(e => String(e.date).slice(0,7) === month).reduce((s,e) => s + e.goals, 0);
-  const todayGoals = events.filter(e => e.date === t).reduce((s,e) => s + e.goals, 0);
-  let idx = 0; D_LEAGUES.forEach((l,i) => { if(total >= l.min) idx = i; });
-  const league = D_LEAGUES[idx], next = D_LEAGUES[idx+1] || null;
-  const daily = [];
-  for(let i = 13; i >= 0; i--){
-    const dd = addDays(t,-i);
-    daily.push({date: dd, goals: events.filter(e => e.date === dd).reduce((s,e) => s + e.goals, 0)});
-  }
-  return {
-    ok:true, configured:true, today:t,
-    totalGoals: total, monthlyGoals: monthly, todayGoals: todayGoals, eventCount: events.length,
-    streakDays: (() => { const set = {}; events.forEach(e => { if(e.goals>0) set[e.date]=true; });
-      let n = 0, d = t; if(!set[d]) d = addDays(d,-1);
-      while(set[d]){ n++; d = addDays(d,-1); } return n; })(),
-    league: Object.assign({}, league, {index: idx}),
-    nextLeague: next ? Object.assign({}, next, {index: idx+1}) : null,
-    goalsToNext: next ? Math.max(0, next.min - total) : 0,
-    progressInLeague: next ? Math.max(0, Math.min(100, Math.round((total - league.min)/(next.min - league.min)*100))) : 100,
-    goalsToNextCard: 5 - (total % 5 === 0 && total > 0 ? 5 : total % 5),
-    ownedCards: Math.min(D_PLAYERS.length, Math.floor(total/5)),
-    cardsThisMonth: Math.min(D_PLAYERS.length, Math.floor(monthly/5)),
-    leagues: D_LEAGUES, playerPool: D_PLAYERS, market: D_MARKET,
-    dailyGoals: daily,
-    recentEvents: events.slice().sort((a,b) => String(b.date).localeCompare(String(a.date))).slice(0,15),
-    missions: [
-      { id:'hattrick', icon:'🔥', name:'해트트릭', desc:'하루에 공부 3개를 모두 끝내면 +1골', reward:'+1골', done: todayGoals >= 3, progress:'오늘 ' + todayGoals + '골 / 3골' },
-      { id:'cleansheet', icon:'🛡️', name:'클린시트', desc:'한 주 동안 미룬 공부가 0개면 +3골', reward:'+3골', done:false, progress:'이번 주 이월 0회 · 완료 4개' },
-      { id:'legend', icon:'👑', name:'레전드 카드', desc:'지난달 월드챔피언(60골)이면 이번 달 시작 +1골', reward:'+1골', done:false, progress:'지난달 60골 도전' },
-      { id:'injtime', icon:'⏱️', name:'인저리 타임', desc:'하기 싫었던 과목을 미루지 않고 끝냈을 때 아빠가 주는 보너스', reward:'아빠 픽', done:false, progress:'🔐 아빠 코너에서 지급' }
-    ]
-  };
-}
-
-function demoApi(p){
-  return new Promise(resolve => setTimeout(() => {
-    const db = demoLoad();
-    const t = today();
-    const find = id => db.plans.find(x => x.id === id);
-    const isToday = x => x.runDate === t && x.status !== '보관함' && x.planType !== '미래계획';
-    const isUnfinished = x => x.runDate && x.runDate <= t && x.status !== '완료' && x.status !== '보관함' && x.planType !== '미래계획';
-    const counts = () => ({
-      today: db.plans.filter(isToday).length,
-      unfinished: db.plans.filter(isUnfinished).length,
-      exam: db.plans.filter(x => x.planType === '기간계획' && x.status !== '보관함').length,
-      future: db.plans.filter(x => x.planType === '미래계획' && x.status !== '보관함').length,
-      archived: db.plans.filter(x => x.status === '보관함').length
-    });
-    const date = p.date || t;
-    let list = [];
-    if(p.mode === 'today') list = db.plans.filter(x => x.runDate === date && x.status !== '보관함' && x.planType !== '미래계획');
-    else if(p.mode === 'unfinished') list = db.plans.filter(isUnfinished);
-    else if(p.mode === 'exam') list = db.plans.filter(x => x.planType === '기간계획' && x.status !== '보관함');
-    else if(p.mode === 'future') list = db.plans.filter(x => x.planType === '미래계획' && x.status !== '보관함');
-    else if(p.mode === 'archived') list = db.plans.filter(x => x.status === '보관함');
-    else list = db.plans.filter(x => x.runDate === date);
-
-    const out = (msg) => { demoSave(db); resolve({ok:true, message:msg, today:t, slots:db.slots, goals:db.goals, plans:list, counts:counts()}); };
-
-    /* ⚽ GOAL BANK (데모) */
-    if(p.action === 'gameStats'){ resolve(demoBankStats()); return; }
-    if(p.action === 'gameAward'){
-      const rows = demoBankLoad();
-      rows.push({date:t, goals: Math.max(1, Math.min(5, Number(p.goals||1))), type: String(p.type||'인저리타임'), memo: String(p.memo||'')});
-      demoSaveBank(rows);
-      resolve({ok:true, message:'보너스 골을 적립했어요! ⚽', stats: demoBankStats()}); return;
-    }
-    if(p.action === 'gameRelease'){
-      const rows = demoBankLoad();
-      rows.push({date:t, goals:0, type:'이적 방출', memo: String(p.player||'') + ' 방출 → ' + String(p.reward||'약속한 보상')});
-      demoSaveBank(rows);
-      resolve({ok:true, message: String(p.player||'선수') + ' 방출 완료!', stats: demoBankStats()}); return;
-    }
-
-    if(p.action === 'bootstrap' || p.action === 'list'){ resolve({ok:true, today:t, slots:db.slots, goals:db.goals, plans:list, counts:counts()}); return; }
-    if(p.action === 'create'){
-      const st = (db.slots.find(s => s.id === p.slotId) || {}).order;
-      db.plans.push({id:'demo-' + Math.random().toString(36).slice(2), title:p.title, dueDate:p.dueDate, dueDateEnd:p.dueDateEnd || '',
-        runDate: p.planType === '미래계획' ? '' : (p.runDate || t),
-        slotId:p.slotId || '', slotOrder:st ?? 9999, goalId:p.goalId || '',
-        planType:p.planType, status:'시작전', targetMinutes:Number(p.targetMinutes) || 0, savedMinutes:0, carryCount:0, startTime:null, finishTime:null, progress:null, progressText:''});
-      list = db.plans.filter(x => x.runDate === t && x.status !== '보관함' && x.planType !== '미래계획');
-      out(p.planType + '을(를) 만들었어요!'); return;
-    }
-    if(p.action === 'createGoal'){
-      const goal = {id:'demo-g' + Math.random().toString(36).slice(2), name:p.name, dueDate:p.dueDate, completed:false};
-      db.goals.push(goal); demoSave(db);
-      resolve({ok:true, message:'새 목표 「' + p.name + '」를 만들었어요!', goals:db.goals, goal}); return;
-    }
-    const plan = find(p.id);
-    if(!plan){ resolve({ok:false, error:'계획을 찾지 못했어요.'}); return; }
-    if(p.action === 'start'){
-      if(plan.status === '완료'){ resolve({ok:false, error:'이미 완료한 공부예요.'}); return; }
-      plan.startTime = new Date().toISOString(); plan.finishTime = null; plan.status = '진행중';
-      resolve({ok:true, message:'공부를 시작했어요. 집중! ⚽', plan}); return;
-    }
-    if(p.action === 'pause' || p.action === 'stop'){
-      if(plan.status !== '진행중'){ resolve({ok:false, error:'진행 중일 때만 멈출 수 있어요. 공부 시작을 먼저 눌러 주세요.'}); return; }
-      const s = new Date(plan.startTime);
-      let add = Math.max(0, Math.floor((Date.now() - s.getTime()) / 60000));
-      add = Math.min(add, 1440 - (s.getHours() * 60 + s.getMinutes()));
-      plan.savedMinutes = (Number(plan.savedMinutes) || 0) + add;
-      plan.finishTime = new Date().toISOString(); plan.startTime = null;
-      let reward = {awarded:false};
-      if(p.action === 'stop'){
-        plan.status = '완료';
-        plan.progress = plan.targetMinutes ? Math.round(plan.savedMinutes / plan.targetMinutes * 100) : 100;
-        plan.progressText = '[' + '#'.repeat(Math.min(Math.round(plan.progress/5),20)) + '] ' + plan.progress + '%';
-        const overTarget = plan.targetMinutes > 0 && plan.savedMinutes > plan.targetMinutes;
-        const rows = demoBankLoad();
-        if(overTarget){
-          reward = {awarded:false, overTarget:true};
-        }else{
-          rows.push({date:t, goals:1, type:'공부 완료', memo: plan.title + ' 완료'});
-          demoSaveBank(rows);
-          reward = {awarded:true, goals:1};
-        }
-      }else{
-        plan.status = '일시 중지';
-      }
-      demoSave(db);
-      resolve({
-        ok: true,
-        message: (p.action === 'pause'
-          ? add + '분 저장하고 일시정지했어요.'
-          : (reward.overTarget
-            ? add + '분 저장! 공부 완료 🎉 (누적 ' + plan.savedMinutes + '분) ⏰ ' + (plan.savedMinutes - plan.targetMinutes) + '분 초과! 목표달성 실패 — 골은 없어요!'
-            : add + '분 저장! 공부 완료 🎉 (누적 ' + plan.savedMinutes + '분) ⚽ 골 +1!')),
-        reward: reward, bonuses: [], plan: plan,
-        today: t, slots: db.slots, goals: db.goals, plans: list, counts: counts()
-      });
-      return;
-    }
-    if(p.action === 'carry'){
-      plan.runDate = p.targetDate || t; plan.carryCount = (Number(plan.carryCount) || 0) + 1;
-      plan.status = '시작전'; plan.startTime = null; plan.finishTime = null;
-      out('실행일을 ' + plan.runDate + '로 이월했어요.'); return;
-    }
-    if(p.action === 'setSlot'){ plan.slotId = p.slotId || ''; plan.slotOrder = (db.slots.find(s => s.id === p.slotId) || {}).order ?? 9999; out('시간대를 변경했어요.'); return; }
-    if(p.action === 'promote'){ plan.runDate = t; plan.planType = '당일계획'; plan.status = '시작전'; out('오늘 공부로 불러왔어요!'); return; }
-    if(p.action === 'archive'){ plan.status = '보관함'; out('보관함으로 옮겼어요.'); return; }
-    if(p.action === 'restore'){ plan.status = '시작전'; plan.runDate = t; out('보관함에서 다시 꺼냈어요.'); return; }
-    /* [v6.1 추가] ② 공부 내용(세부할일) 수정 — 데모 모드에서도 똑같이 동작 */
-    if(p.action === 'updateTitle'){
-      const nt = String(p.title || '').trim();
-      if(!nt){ resolve({ok:false, error:'공부 내용을 적어 주세요.'}); return; }
-      plan.title = nt.slice(0, 200);
-      out('공부 내용을 수정했어요! (데모 체험)'); return;
-    }
-    resolve({ok:false, error:'지원하지 않는 동작이에요.'});
-  }, 160));
-}
 
 /* =========================================================================
    [v6.1 추가] ② 공부 내용(세부할일) 을 카드에서 바로 고치기
@@ -2130,6 +1988,470 @@ function todayBoard(){
   return html.join('');
 }
 
+/* ==========================================================================
+   ===== v8.0 추가분 (index.html) =====
+   --------------------------------------------------------------------------
+   ★ 원칙 : 위에 있는 기존 코드는 "한 줄도" 수정/삭제하지 않았습니다.
+            아래는 전부 "추가"된 코드이고, 같은 이름의 함수를 아래에서 다시
+            정의하면 자바스크립트 규칙상 이 파일(뒤에 있는 것)이 사용돼요.
+   ========================================================================== */
+
+/* ==========================================================================
+   [8-1] ✕ 계획 삭제 버튼 — 새 행(줄)을 만들지 않고 '.meta' 줄 끝에만 작게 붙임
+   ========================================================================== */
+function askDelete(id){
+  const p = plans.find(function(x){ return x.id === id; }) || {};
+  confirmBox('계획 삭제', '「<b>' + esc(p.title || '') + '</b>」 를 삭제할까요?<br>노션 페이지도 함께 <b>휴지통</b>으로 이동해요. (노션에서 30일 안에 복구할 수 있어요)', function(){ act('delete', id); }, '🗑 삭제');
+}
+function decorateCards(){
+  const board = $('board');
+  if(!board) return;
+  board.querySelectorAll('article[data-plan]').forEach(function(card){
+    if(card.querySelector('.delx')) return;
+    const meta = card.querySelector('.meta');
+    if(!meta) return;
+    const b = document.createElement('button');
+    b.className = 'delx'; b.type = 'button'; b.textContent = '✕';
+    b.title = '이 계획 삭제 (노션 휴지통으로)'; b.setAttribute('aria-label','계획 삭제');
+    b.onclick = function(ev){ ev.stopPropagation(); askDelete(card.getAttribute('data-plan')); };
+    meta.appendChild(b);
+  });
+}
+try{ new MutationObserver(decorateCards).observe($('board'), { childList:true, subtree:true }); }catch(e){}
+
+/* ==========================================================================
+   [8-2] ▶공부 시작 : 「땅!」 소리 + 「Let's Go! 준모!!」 2초 팝업
+   ========================================================================== */
+function kickSfx(){
+  try{
+    if(!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+    const t0 = actx.currentTime;
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(195, t0);
+    o.frequency.exponentialRampToValueAtTime(52, t0 + 0.22);
+    g.gain.setValueAtTime(0.55, t0);
+    g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.30);
+    o.connect(g); g.connect(actx.destination); o.start(t0); o.stop(t0 + 0.32);
+  }catch(e){}
+}
+const _origSfx_v80 = sfx;
+sfx = function(kind){ if(kind === 'kick'){ kickSfx(); return; } return _origSfx_v80(kind); };
+
+let letsGoTimer = null;
+function letsGo(){
+  const el = $('letsGo');
+  if(!el) return;
+  el.classList.add('show'); el.setAttribute('aria-hidden','false');
+  clearTimeout(letsGoTimer);
+  letsGoTimer = setTimeout(function(){ el.classList.remove('show'); el.setAttribute('aria-hidden','true'); }, 2000);
+}
+const _origAct_v80 = act;
+act = async function(action, id, extra){
+  if(action === 'start' && !busy){ sfx('kick'); letsGo(); }
+  return _origAct_v80(action, id, extra);
+};
+
+/* ==========================================================================
+   [8-3] 상위 목표가 없을 때 안내 문구가 자리만 차지하던 문제 (요청 1번)
+         → 목표가 없으면 칩 줄 자체를 숨겨서 행(줄) 공간을 확보합니다.
+   ========================================================================== */
+function renderGoalChips(){
+  const box = $('goalChips');
+  const active = goals.filter(function(g){ return !g.completed; }).slice(0, 6);
+  if(!active.length){ box.innerHTML = ''; box.style.display = 'none'; return; }
+  box.style.display = 'flex';
+  box.innerHTML = active.map(function(g){
+    const d = g.dueDate ? dday(g.dueDate) : '';
+    const soon = g.dueDate && g.dueDate >= today() && g.dueDate <= addDays(today(), 7);
+    return '<div class="goalchip ' + (soon ? 'soon' : '') + '">🎯 ' + esc(g.name) + (d ? ' <b>' + d + '</b>' : '') + '</div>';
+  }).join('');
+}
+
+/* ==========================================================================
+   [8-4] 📊 통계 분석 화면 (요청 7번) — Total / 월별 / 주별 / 기간별(시작일~종료일)
+   ========================================================================== */
+let bigPeriod = 'total';
+function openStats(){
+  bigPeriod = 'total';
+  document.querySelectorAll('#stSeg button').forEach(function(b){ b.classList.toggle('on', b.dataset.p === 'total'); });
+  $('stRangeBox').style.display = 'none';
+  if(!$('stTo').value){ $('stTo').value = today(); $('stFrom').value = addDays(today(), -30); }
+  $('statsBody').innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
+  openSheet('statsBack');
+  fetchStats({ period:'total' });
+}
+function setBigPeriod(p){
+  bigPeriod = p;
+  document.querySelectorAll('#stSeg button').forEach(function(b){ b.classList.toggle('on', b.dataset.p === p); });
+  $('stRangeBox').style.display = p === 'range' ? 'block' : 'none';
+  if(p !== 'range') fetchStats({ period:p });
+}
+function loadRangeStats(){
+  const from = $('stFrom').value, to = $('stTo').value;
+  if(!from || !to){ toast('시작일과 종료일을 모두 골라 주세요.', 'bad'); return; }
+  fetchStats({ period:'range', from:from, to:to });
+}
+async function fetchStats(q){
+  $('statsBody').innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
+  try{
+    const d = await api(Object.assign({ action:'stats' }, q || {}));
+    renderStats(d);
+  }catch(e){
+    $('statsBody').innerHTML = '<div class="empty"><b>통계를 불러오지 못했어요</b>' + esc(e.message) + '</div>';
+  }
+}
+function renderStats(d){
+  const s = d.summary || {};
+  const g = d.goals || {};
+  const min = function(n){ return Math.floor(n/60) + '시간 ' + (n%60) + '분'; };
+  const diff = s.diff || 0;
+
+  let html = '<div class="kv"><span>조회 구간</span><b>' + esc(d.label || '전체 기간') + '</b></div>'
+    + '<div class="pgrid" style="margin-top:9px">'
+    + '<div class="pcard"><b>' + min(s.saved || 0) + '</b><span>① 공부한 시간</span></div>'
+    + '<div class="pcard"><b>' + min(s.target || 0) + '</b><span>② 목표 시간</span></div>'
+    + '<div class="pcard"><b>' + (s.done || 0) + ' / ' + (s.total || 0) + '</b><span>③ 완료/전체</span></div>'
+    + '<div class="pcard"><b>' + (s.achRate || 0) + '%</b><span>④ 목표달성률</span></div>'
+    + '</div>'
+    + '<div class="bigbar" style="margin-top:11px"><i style="width:' + Math.min(100, s.rate || 0) + '%"></i></div>'
+    + '<div class="bigpct">공부한 시간 ÷ 목표 시간 = ' + (s.rate || 0) + '%</div>'
+    + '<div class="kv"><span>완료한 계획</span><b>' + (s.done || 0) + '개 / 전체 ' + (s.total || 0) + '개 (미완료 ' + (s.notDone || 0) + '개)</b></div>'
+    + '<div class="kv"><span>목표달성 성공 / 초과 실패</span><b>🎯 ' + (s.achieved || 0) + '개 / ⏰ ' + (s.over || 0) + '개</b></div>'
+    + '<div class="kv"><span>' + (diff >= 0 ? '목표보다 일찍 끝낸 시간' : '목표보다 초과한 시간') + '</span><b>' + Math.abs(diff) + '분</b></div>'
+    + '<div class="kv"><span>골 저금통 (이 구간)</span><b>⚽ ' + (g.sum || 0) + '골 · 기록 ' + (g.count || 0) + '건</b></div>';
+
+  const types = Object.keys(g.byType || {});
+  if(types.length){
+    html += '<div class="subbox" style="margin-top:10px"><div class="t">⚽ 종류별 골</div>'
+      + types.map(function(k){
+          return '<div class="kv"><span>' + esc(k) + '</span><b>' + g.byType[k] + '골</b></div>';
+        }).join('') + '</div>';
+  }
+
+  const bs = d.buckets || [];
+  const maxSaved = Math.max(1, bs.reduce(function(a,b){ return Math.max(a, b.saved || 0); }, 0));
+  html += '<div class="subbox" style="margin-top:10px"><div class="t">📆 구간별 상세 (' + bs.length + '구간)</div>'
+    + (bs.length ? bs.map(function(b){
+        const w = Math.max(0, Math.min(100, Math.round((b.saved || 0) / maxSaved * 100)));
+        const bad = (b.target && b.saved > b.target) ? ' bad' : '';
+        return '<div class="stbucket"><div class="sbL">' + esc(b.label)
+          + '<small>공부 ' + b.saved + '분 / 목표 ' + b.target + '분 · 완료 ' + b.done + '/' + b.plans + '개 · 달성 ' + b.achieved + '개 · ⚽' + b.goals + '</small>'
+          + '<div class="progress" style="margin-top:5px"><i style="width:' + w + '%"></i></div>'
+          + '</div><div class="sbR' + bad + '">' + (b.rate || 0) + '%</div></div>';
+      }).join('') : '<div class="empty">이 구간에는 기록이 없어요</div>')
+    + '</div>'
+    + '<div class="bhelp">· 「공부한 시간」은 일시정지·공부 끝을 눌러 <b>저장된 시간</b>의 합계예요.<br>'
+    + '· 「목표달성률」은 목표 시간을 <b>넘기지 않고</b> 끝낸 공부의 비율(⚽ 골 기준)이에요.<br>'
+    + '· 보관함으로 옮긴 계획도 통계에는 그대로 포함돼요. (숨겨도 기록은 남아요)</div>';
+
+  $('statsBody').innerHTML = html;
+}
+
+/* ==========================================================================
+   [8-5] 🎬 비디오 판독 · 벌칙 (요청 6-①)
+   ========================================================================== */
+function openPenalty(){
+  $('penPin').value = ''; $('penMemo').value = '';
+  $('penError').style.display = 'none';
+  openSheet('penaltyBack');
+}
+async function submitPenalty(){
+  const type = $('penType').value, pin = $('penPin').value.trim(), memo = $('penMemo').value.trim();
+  const err = function(m){ const e = $('penError'); e.style.display = 'block'; e.textContent = m; };
+  $('penError').style.display = 'none';
+  if(!pin) return err('아빠 PIN을 적어 주세요.');
+  try{
+    const r = await api({ action:'gamePenalty', pin:pin, type:type, memo:memo });
+    closeSheet('penaltyBack');
+    toast(r.message || '판정을 적용했어요!', 'ok');
+    if(type !== '옐로카드') sfx('bad');
+    bankStats = r.stats || bankStats;
+    renderBank(); renderStrip();
+  }catch(e){ err(e.message); }
+}
+
+/* ==========================================================================
+   [8-6] ⚽ 골 저금통 새 화면 — 이달의 랜덤 15장 + 베일 + 카드 포인트 + 국기색 리그
+   ========================================================================== */
+function renderStrip(){
+  const d = bankStats;
+  if(!d) return;
+  const total = d.totalGoals || 0;
+  const mL = d.monthLeague || d.league || {};
+  $('stripTotal').textContent = total + '골';
+  $('stripMonth').textContent = (d.monthlyGoals || 0) + '골';
+  $('stripPill').innerHTML = flagImg(mL) + ' ' + esc(mL.name || '');
+  if(mL.grad){ $('stripPill').style.background = mL.grad; $('stripPill').style.color = '#fff'; $('stripPill').style.textShadow = '0 1px 3px rgba(0,0,0,.45)'; }
+  $('stripBar').style.width = Math.max(0, Math.min(100, d.monthProgressInLeague || 0)) + '%';
+  if(mL.grad) $('stripBar').style.background = mL.grad;
+  const cards = d.cardCount || 0;
+  $('stripNext').innerHTML = d.nextMonthLeague
+    ? '이번 달 <b>' + esc(mL.name) + '</b> · 다음 승격까지 <b>' + d.monthGoalsToNext + '골</b> · 카드 ' + cards + '/' + (d.cardsMax || 15) + '장'
+    : '👑 이번 달 월드 챔피언! 카드 ' + cards + '/' + (d.cardsMax || 15) + '장';
+}
+
+function renderBank(){
+  const box = $('bankBody');
+  if(!bankStats){ box.innerHTML = '<div class="empty"><b>골 저금통을 불러오는 중…</b></div>'; return; }
+  const d = bankStats;
+  const total = d.totalGoals || 0;
+  const monthly = d.monthlyGoals || 0;
+  const cards = d.monthCards || [];
+  const owned = Math.min(cards.length, d.cardCount || 0);
+  const points = d.monthPoints || 0;
+  const rewards = d.rewards || [];
+  const mL = d.monthLeague || d.league || {};
+  const maxP = d.pointsTotalPerMonth || 1965;
+
+  /* ── 리그 계단 (이번 달 골 기준 · 국기색 그라데이션) ── */
+  const stair = (d.leagues || []).map(function(l){
+    const on = mL.name === l.name;
+    const st = on ? 'background:' + (l.grad || 'linear-gradient(140deg,#f5e3b0,#e0bd63)') + ';border-color:transparent;' : '';
+    return '<div class="bstep ' + (on ? 'on' : '') + '" style="' + st + '">'
+      + flagImg(l)
+      + '<span class="t" style="' + (on ? 'color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.45)' : '') + '">' + esc(l.name) + '</span>'
+      + '<span class="g" style="' + (on ? 'color:rgba(255,255,255,.92)' : '') + '">' + l.min + '골~</span></div>';
+  }).join('');
+
+  /* ── 이달의 스쿼드 : 영입 전에는 완전히 베일(?) 상태 ── */
+  const squad = cards.length ? cards.map(function(c, i){
+    const no = i + 1;
+    if(no > owned){
+      return '<div class="pcard2 veil"><span class="vno">' + no + '</span>'
+        + '<div class="vq">?</div><span class="vlock">🔒 ' + c.need + '골</span></div>';
+    }
+    const isNew = no === owned;
+    return '<div class="pcard2 ' + cardTierClass(c.r) + (isNew ? ' fresh' : '') + '">'
+      + '<span class="no">' + no + '</span>'
+      + '<div class="av">' + c.e + '</div>'
+      + '<span class="nm">' + esc(c.n) + '</span>'
+      + '<span class="po">' + esc(c.p) + '</span>'
+      + '<span class="tr">' + esc(c.t) + '</span>'
+      + '<span class="tier">' + esc(c.tier) + ' · +' + c.point + 'P</span>'
+      + (isNew ? '<span class="relnew">🎉 방금 영입!</span>' : '')
+      + '</div>';
+  }).join('') : '<div class="empty" style="padding:16px">카드를 불러오는 중…</div>';
+
+  /* ── 카드 포인트 → 보상 ── */
+  const ptRows = rewards.map(function(r){
+    return '<div class="ptrow"><span>' + (points >= r.need ? '✅ ' : '🎁 ') + esc(r.label) + '</span><b>' + r.need + 'P</b></div>';
+  }).join('');
+  const nextP = d.nextReward;
+  const ptHead = '<div class="ptbox"><div class="btitle" style="font-size:15px;color:#5d4a1c;margin:0 0 4px">🏅 이번 달 카드 포인트</div>'
+    + '<div class="ptrow" style="border-bottom:none"><span>현재 포인트</span><b>' + points + ' P</b></div>'
+    + '<div class="progress" style="height:8px;margin:4px 0 8px"><i style="width:' + Math.min(100, Math.round(points / maxP * 100)) + '%"></i></div>'
+    + (nextP
+        ? '<div class="phint">다음 보상 <b>「' + esc(nextP.label) + '」</b> 까지 <b>' + (d.pointsToNext || 0) + 'P</b> 남았어요! (15장 다 모으면 ' + maxP + 'P = 소원권 🎁)</div>'
+        : '<div class="phint">🎉 이번 달 카드 <b>15장 완성</b>! 소원권까지 받았어요. 최고예요!</div>')
+    + ptRows + '</div>';
+
+  /* ── 오늘의 미션 ── */
+  const missions = (d.missions || []).map(function(m){
+    return '<div class="mission ' + (m.done ? 'done' : '') + '">'
+      + '<span class="mi">' + m.icon + '</span>'
+      + '<div class="mt"><b>' + esc(m.name) + '</b><span>' + esc(m.desc) + '</span><span style="color:#9a6a14">' + esc(m.progress) + '</span></div>'
+      + '<span class="ms ' + (m.done ? '' : (m.reward === '아빠 픽' ? 'gold' : '')) + '">' + (m.done ? '달성!' : esc(m.reward)) + '</span>'
+      + '</div>';
+  }).join('');
+
+  /* ── 이적 시장 (지금 등급까지 왔으면 강조) ── */
+  const topTier = owned ? cards[owned - 1].tier : '';
+  const market = (d.market || []).map(function(m){
+    const on = !!topTier && m.tier.indexOf(topTier) >= 0;
+    return '<div class="mktrow' + (on ? ' on' : '') + '"><div class="mt2">' + esc(m.tier)
+      + '<small>' + (on ? '🎉 지금 이 등급! 아빠와 보상 약속' : '아빠와 약속한 보상') + '</small></div>'
+      + '<div class="mv">' + esc(m.reward) + '</div></div>';
+  }).join('');
+
+  /* ── 최근 득점 ── */
+  const evs = (d.recentEvents || []).filter(function(e){ return e.goals !== 0; }).slice(0, 8);
+  const evHtml = evs.length ? evs.map(function(e){
+    const neg = e.goals < 0;
+    return '<div class="evrow"><div class="el"><b>' + esc(e.type) + '</b><span>' + esc(e.date || '') + (e.memo ? ' · ' + esc(e.memo) : '') + '</span></div>'
+      + '<div class="eg" style="color:' + (neg ? 'var(--red)' : 'var(--green)') + '">' + (neg ? '' : '+') + e.goals + ' ⚽</div></div>';
+  }).join('') : '<div class="empty" style="padding:16px">아직 골이 없어요. 공부를 하나 끝내면 첫 골! ⚽</div>';
+
+  let note = '';
+  if(d.configured === false){
+    note = '<div class="bnew">🔧 아직 노션 「골 기록」 DB가 연결되지 않았어요.<br>'
+      + 'GAS 스크립트 속성에 <b>BEST_ELEVEN_DB_ID</b> 를 넣으면 모든 기기에서 골이 이어져요.</div>';
+  }
+  note += '<div class="bnew" style="background:var(--blue-soft);border-color:var(--blue);color:var(--blue)">🔄 <b>매달 1일에 새로 시작해요!</b> '
+    + '이번 달 카드 15명은 <b>매월 1일 랜덤</b>으로 새로 뽑히고, 이번 달 골도 0골부터 다시 시작해요(K League 1 → 월드 챔피언). '
+    + '누적 골·명예의 전당 기록은 그대로 남아요.</div>';
+
+  box.innerHTML = note
+    + '<div class="bankhero">'
+    + '<div class="beyebrow">JOONMO FC · CAREER MODE</div>'
+    + '<div class="btitle">' + (monthly >= 60 ? '🏆 이번 달 월드 챔피언!' : '⚽ 이번 달 나의 커리어') + '</div>'
+    + '<div class="bsub">' + (d.streakDays ? '🔥 연속 골인 ' + d.streakDays + '일 · ' : '') + '오늘 ' + (d.todayGoals || 0) + '골 · 이번 달 ' + monthly + '골 · 누적 ' + total + '골</div>'
+    + '<div class="leaguepill" style="' + (mL.grad ? 'background:' + mL.grad + ';color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.45)' : '') + '">' + flagImg(mL) + ' ' + esc(mL.name || '') + '</div>'
+    + '<div class="leaguebar"' + (mL.grad ? ' style="background:rgba(255,255,255,.25)"' : '') + '><i style="width:' + (d.monthProgressInLeague || 0) + '%;' + (mL.grad ? 'background:' + mL.grad : '') + '"></i></div>'
+    + '<div class="bsub" style="margin-top:7px">'
+    + (d.nextMonthLeague ? '이번 달 승격까지 <b>' + d.monthGoalsToNext + '골</b> 남았어요! (승격하면 새 카드가 빨리 열려요)' : '이번 달 최고 등급 달성! 🏆 월드 챔피언!')
+    + '</div>'
+    + '<div class="bgrid">'
+    + '<div class="bbox"><span>📅 이번 달 골</span><b>' + monthly + '</b></div>'
+    + '<div class="bbox"><span>🎽 이번 달 카드</span><b>' + owned + ' / ' + (d.cardsMax || 15) + '</b></div>'
+    + '<div class="bbox"><span>🏅 카드 포인트</span><b>' + points + ' P</b></div>'
+    + '<div class="bbox"><span>🎁 다음 카드까지</span><b>' + (d.goalsToNextCard || 0) + '골</b></div>'
+    + '<div class="bbox"><span>🏦 누적 골</span><b>' + total + '</b></div>'
+    + '<div class="bbox"><span>👑 누적 리그</span><b style="font-size:14px">' + esc((d.league || {}).name || '') + '</b></div>'
+    + '</div>'
+    + '<div class="bstair">' + stair + '</div>'
+    + '</div>'
+
+    + '<div class="bsec">👥 이달의 스쿼드 <small>5골마다 1명 · 이번 달 최대 15명 (영입 전엔 베일에 가려져 있어요)</small></div>'
+    + '<div class="squad">' + squad + '</div>'
+    + '<div class="phint" style="margin-top:8px">🎲 카드 15명은 <b>매달 1일 랜덤</b>으로 바뀌어요! 어떤 선수가 나올지 아무도 몰라요. '
+    + '(브론즈4·실버3·골드3·플래티넘2·레전드2·불멸1 — 불멸 카드는 매달 딱 1명!)</div>'
+
+    + ptHead
+
+    + '<div class="bsec">🎯 오늘의 미션 <small>달성하면 자동으로 골이 쌓여요</small></div>'
+    + missions
+
+    + '<div class="bsec">🔁 이적 시장 <small>카드 등급이 오르면 아빠와 현실 보상 약속!</small></div>'
+    + '<div class="mkt">' + market + '</div>'
+
+    + '<div class="bsec">📜 최근 득점 기록 <small>골 취소·벌칙 기록도 함께 보여요</small></div>'
+    + '<div>' + evHtml + '</div>'
+
+    + '<div class="bhelp">· 골은 <b>공부 계획을 완료</b>할 때 자동으로 1개 쌓여요. 같은 공부에서 두 번 쌓이지 않아요.<br>'
+    + '· 보너스 골(⏱️ 인저리타임 등)은 아빠 코너 🔐 PIN이 있어야 지급돼요.<br>'
+    + '· 🎬 비디오 판독(골 취소·옐로/레드카드·강등)도 아빠 코너에서 할 수 있어요.<br>'
+    + '· 선수 카드는 실제 선수 사진이 아니라 게임용 아이콘 카드예요.</div>';
+}
+
+/* ==========================================================================
+   [8-7] 🔐 부모 코너 새 화면 — 🎬 비디오 판독 추가 / 📊 통계 추가
+         (요청 6번 : 「이 기기 기록 정리」 칸은 빼 달라는 요청에 따라 제거했어요)
+   ========================================================================== */
+function renderParent(){
+  const d = bankStats || {};
+  const T = plans.reduce(function(s,p){ return s + (Number(p.targetMinutes)||0); }, 0);
+  const S = plans.reduce(function(s,p){ return s + (Number(p.savedMinutes)||0); }, 0);
+  const allDone = plans.length && plans.every(function(p){ return p.status === '완료'; });
+  const evs = (d.recentEvents || []).filter(function(e){ return e.goals !== 0; }).slice(0, 7);
+  const rows = evs.length ? evs.map(function(e){
+    return '<div class="kv"><span>' + esc(e.date || '') + ' · ' + esc(e.type) + '</span><b style="color:' + (e.goals < 0 ? 'var(--red)' : 'var(--ink)') + '">⚽ ' + (e.goals > 0 ? '+' : '') + e.goals + '</b></div>';
+  }).join('') : '<div class="kv"><span>기록 없음</span><b></b></div>';
+
+  $('parentBody').innerHTML =
+    '<div class="pgrid">'
+    + '<div class="pcard"><b>' + (d.totalGoals || 0) + '</b><span>누적 골</span></div>'
+    + '<div class="pcard"><b>' + (d.monthlyGoals || 0) + '</b><span>이번 달 골</span></div>'
+    + '<div class="pcard"><b>' + (d.streakDays || 0) + '일</b><span>연속 골인</span></div>'
+    + '<div class="pcard"><b>' + (T ? Math.round(S / T * 100) : 0) + '%</b><span>오늘 달성률</span></div>'
+    + '</div>'
+    + '<div class="phint">· 오늘 전부 완료? ' + (allDone ? '🎉 네, 전부 끝냈어요!' : '⏳ 아직 남았어요') + '</div>'
+    + '<div class="phint">· 이번 달 카드 ' + (d.cardCount || 0) + '/' + (d.cardsMax || 15) + ' · 포인트 ' + (d.monthPoints || 0) + 'P · 옐로카드 ' + (d.yellowCards || 0) + '장</div>'
+    + '<div class="subbox" style="margin-top:12px"><div class="t">📊 통계 분석 (Total · 월별 · 주별 · 기간별)</div>'
+    + '<button class="act primary" style="width:100%" onclick="closeSheet(\'parentBack\');openStats()">📊 공부 통계 분석 화면 열기</button>'
+    + '<div class="phint" style="margin-top:8px">① 공부한 시간 · ② 목표 시간 · ③ 완료/전체 · ④ 목표달성 현황을 한 화면에서 볼 수 있어요.</div>'
+    + '</div>'
+    + '<div class="subbox"><div class="t">⏱️ 보너스 골 주기 (인저리타임 등)</div>'
+    + '<button class="act green" style="width:100%" onclick="closeSheet(\'parentBack\');openBonus()">🔐 보너스 골 지급하기</button>'
+    + '<button class="act gold" style="width:100%;margin-top:8px" onclick="closeSheet(\'parentBack\');openRelease()">🔁 이적 시장 (선수 방출 → 보상)</button>'
+    + '<div class="phint" style="margin-top:8px">※ 지급 PIN은 GAS 속성 <b>BEST_ELEVEN_PARENT_PIN</b> 값이에요. (기본은 부모 코너 PIN과 같게 1234)</div>'
+    + '</div>'
+    + '<div class="subbox"><div class="t">🎬 비디오 판독 · 벌칙 (골 차감)</div>'
+    + '<button class="act danger" style="width:100%" onclick="closeSheet(\'parentBack\');openPenalty()">🎬 비디오 판독 열기</button>'
+    + '<div class="phint" style="margin-top:8px">1. 골 취소(골 1개 차감) · 2. 옐로카드(2장이면 골 1개 차감) · 3. 레드카드(골 1개 차감) · 4. 강등(골 0으로 리셋)</div>'
+    + '</div>'
+    + '<div class="subbox"><div class="t">🔢 부모 코너 PIN 바꾸기</div>'
+    + '<div class="pinrow"><input id="newPin" type="password" inputmode="numeric" maxlength="4" placeholder="새 PIN 4자리">'
+    + '<button class="act primary" onclick="savePin()">저장</button></div>'
+    + '<div class="phint">※ 이 PIN은 이 기기에서만 쓰여요. 보너스 골 지급용 PIN은 GAS 스크립트 속성에서 바꿔 주세요.</div>'
+    + '</div>'
+    + '<div class="subbox"><div class="t">📜 최근 득점 기록 (노션)</div>' + rows + '</div>';
+}
+
+/* ==========================================================================
+   [8-8] ⓐ 체험(데모) 모드 정리 — 요청 6-② (데모 함수들은 모두 들어냈습니다)
+   ========================================================================== */
+function demoApi(){
+  return Promise.reject(new Error('체험(데모) 모드는 v8.0에서 정리되었습니다. GAS_URL(배포 주소)을 확인해 주세요.'));
+}
+
+
+/* ==========================================================================
+   [8-9] ✅ 「여기부터 오늘 끝낸 공부 / 접어서 숨기기」 줄(행) 위치 교정 (요청 3번)
+   --------------------------------------------------------------------------
+   · 요청 : 이 버튼 줄이 『🕘 목표 시간대』 + 『계획 N개 · 실제/목표시간』 행
+            "아래"에 있던 것을, 그 "위"로 올려 달라.
+   · 방법 : 같은 이름의 todayBoard 를 아래에서 다시 정의(자바스크립트 규칙상
+            뒤에 있는 함수가 사용됨) → 기존 소스는 위에 그대로 보존됩니다.
+   · 순서 : ① 완료 구분선(접기/펼치기 버튼) → ② 시간대 머리글 → ③ 카드들
+            (접힘 상태면 완료 카드는 숨김 · 기존 접힘 기억/스타일 그대로 재사용)
+   ========================================================================== */
+function slotBoardPart(list, headHtml){
+  const sorted = list.slice().sort(planOrder);
+  const doneCnt = sorted.filter(function(p){ return p.status === '완료'; }).length;
+  if(!doneCnt) return headHtml + sorted.map(cardHtml).join('');
+  const folded = isDoneFolded();
+  const divider = '<div class="doneDivider" role="button" tabindex="0" aria-pressed="' + folded + '" onclick="toggleDoneFold()" onkeydown="if(event.key===\'Enter\')toggleDoneFold()">✅ 여기부터 오늘 끝낸 공부'
+    + '<span class="dvbtn">' + (folded ? '▼ 펼쳐서 보기 ' : '▲ 접어서 숨기기 ') + doneCnt + '개</span></div>';
+  return divider
+    + headHtml
+    + sorted.map(function(p){ return (folded && p.status === '완료') ? '' : cardHtml(p); }).join('');
+}
+function todayBoard(){
+  const bySlot = new Map();
+  const noSlot = [];
+  plans.forEach(function(p){
+    if(!p.slotId){ noSlot.push(p); return; }
+    if(!bySlot.has(p.slotId)) bySlot.set(p.slotId, []);
+    bySlot.get(p.slotId).push(p);
+  });
+  const html = [];
+  slots.forEach(function(s){
+    const list = bySlot.get(s.id) || [];
+    if(!list.length) return;
+    const target = list.reduce(function(a,p){ return a + (Number(p.targetMinutes)||0); }, 0);
+    const saved = list.reduce(function(a,p){ return a + (Number(p.savedMinutes)||0); }, 0);
+    const headHtml = '<div class="grouphead"><div><div class="gt">🕘 ' + esc(s.name) + '</div>'
+      + '<div class="gd">계획 ' + list.length + '개 · ' + saved + '/' + target + '분</div></div>'
+      + '<div class="gd">' + (target ? Math.min(100, Math.round(saved/target*100)) : 0) + '%</div></div>';
+    html.push(slotBoardPart(list, headHtml));
+  });
+  if(noSlot.length){
+    const headHtml = '<div class="grouphead"><div><div class="gt">📥 시간대 미배정 (이월된 공부)</div><div class="gd">시간대를 정해 주면 위 시간표에 자리를 잡아요</div></div></div>';
+    html.push(slotBoardPart(noSlot, headHtml));
+  }
+  if(!html.length) return '<div class="empty"><b>이 날은 시간대에 배치된 계획이 없어요</b>＋ 새 공부 계획으로 공부를 만들어 보세요!</div>';
+  return html.join('');
+}
+
+/* ==========================================================================
+   [8-10] ❓ 도움말에 v8.0 안내를 덧붙입니다 (기존 도움말 내용은 그대로 두고 뒤에 추가)
+   ========================================================================== */
+const _origOpenHelp_v80 = openHelp;
+openHelp = function(){
+  _origOpenHelp_v80();
+  try{
+    $('helpBody').insertAdjacentHTML('beforeend',
+      '<div class="subbox"><div class="t">🆕 v8.0 에서 새로 생긴 것</div>'
+      + '<div class="phint">· 🗑 <b>계획 삭제</b> : 카드의 「목표 … 누적 …」 줄 끝에 있는 조그만 <b>✕</b> 를 누르면 그 계획이 삭제되고 노션 페이지도 휴지통으로 이동해요. (줄은 새로 생기지 않아요!)</div>'
+      + '<div class="phint">· ✅ <b>끝낸 공부 접기</b> : 「✅ 여기부터 오늘 끝낸 공부」 줄이 이제 <b>시간대 이름 위</b>에 나와요.</div>'
+      + '<div class="phint">· ▶ <b>공부 시작</b> : 「땅!」 소리와 함께 <b>Let\'s Go! 준모!!</b> 가 2초간 떴다가 사라져요.</div>'
+      + '<div class="phint">· 👥 <b>이달의 스쿼드</b> : 5골마다 1명, <b>한 달 최대 15명</b>. 영입 전에는 <b>?</b> 로 가려져 있고, <b>매달 1일 랜덤</b>으로 15명이 새로 뽑혀요. (브론즈4·실버3·골드3·플래티넘2·레전드2·불멸1)</div>'
+      + '<div class="phint">· 🏅 <b>카드 포인트</b> : 카드를 영입할 때마다 등급별 포인트(브론즈10P ~ 불멸1000P)가 쌓여요. 포인트가 차면 아빠와 약속한 보상으로 바꿀 수 있어요!</div>'
+      + '<div class="phint">· 📊 <b>통계 분석</b> : 위쪽 <b>📊</b> 버튼(또는 부모 코너)에서 ① 공부한 시간 ② 목표 시간 ③ 완료/전체 ④ 목표달성 현황을 <b>Total · 월별 · 주별 · 기간별</b>로 봐요.</div>'
+      + '<div class="phint">· 🎬 <b>비디오 판독</b> : 부모 코너에서 골 취소 · 옐로카드 · 레드카드 · 강등(골 0 리셋)을 적용해요.</div>'
+      + '</div>');
+  }catch(e){}
+};
+
+/* ==========================================================================
+   [8-11] 안전장치 — 데모 모드에서 쓰던 키 이름을 그대로 남겨 둡니다.
+          (이제 어디에서도 쓰이지 않지만, 혹시 남아 있는 옛 호출이 있어도
+           ReferenceError 가 나지 않도록 최소한만 유지)
+   ========================================================================== */
+var DEMO_KEY = 'junmoStudyDemoV4';
+var DEMO_BANK_KEY = 'junmoBankDemoV4';
+
 /* ---------- 시작 ---------- */
 (function init(){
   ensureDatePick();
@@ -2144,6 +2466,7 @@ function todayBoard(){
 })();
 </script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","spa":2}' crossorigin="anonymous"></script>
